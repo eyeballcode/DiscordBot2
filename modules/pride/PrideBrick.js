@@ -168,15 +168,27 @@ module.exports = async (station, platform, bot) => {
     return fullAudio
   })
 
-  let fullAudio = [
-    'item/item49',
-    `station/dst/${stationCodes[station]}_dst`,
-    `platform/name/ctr/pltctr${platform < 10 ? '0' + platform : platform}`,
-    'item/are',
-    'tone/pause2',
-    ...(departureAudioFiles).reduce((a, e) => [...a, ...e, 'tone/pause3'], []),
-    'item/qitem14'
-  ]
+  let fullAudio
+
+  if (departureAudioFiles.length === 0) {
+    fullAudio = [
+      'item/qitem20',
+      `station/dst/${stationCodes[station]}_dst`,
+      `platform/name/eos/plteos${platform < 10 ? '0' + platform : platform}`,
+      'tone/pause1',
+      'item/qitem30'
+    ]
+  } else {
+    fullAudio = [
+      'item/item49',
+      `station/dst/${stationCodes[station]}_dst`,
+      `platform/name/ctr/pltctr${platform < 10 ? '0' + platform : platform}`,
+      'item/are',
+      'tone/pause2',
+      ...(departureAudioFiles).reduce((a, e) => [...a, ...e, 'tone/pause3'], []),
+      'item/qitem14'
+    ]
+  }
 
   let outputFile = path.join(__dirname, 'audio-out', `output-${station}-brick.wav`)
   writeAudio(fullAudio, outputFile)
