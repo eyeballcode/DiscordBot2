@@ -1,0 +1,32 @@
+{
+  "tracking": 11773,
+  "classFormat": {
+    "MENTDY": "trainsssssssss",
+    "NO_CLASS": "min waste time",
+    "CHOIR": "min sing",
+    "JAZZCHOIR": "min sing but in jazz",
+    "MIN_VOX": "min sing but she's alone",
+    "RON_VOX": "min sing but he's alone",
+    "DEFAULT": "min die in {}"
+  },
+  "classNames": {
+    "11SMPA": "comp",
+    "11SMPB": "comp",
+    "11SCHE": "chem",
+    "12MMET": "methods",
+    "11EENL": "lang",
+    "12MALG": "algo",
+    "11LJAP": "jap",
+    "11HGPL": "global pol",
+    "11SBIO": "bio",
+    "11MMET": "methods",
+    "11SENV": "enviro",
+    "11EENG": "english",
+    "MIN_VOX": "vocal lesson",
+    "KEEN_VOX": "vocal lesson",
+    "CHOIR": "choir",
+    "JAZZCHOIR": "jazz choir",
+    "STAGEBAND": "stage band",
+    "11SPHY": "physics"
+  }
+}

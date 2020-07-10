@@ -1,0 +1,29 @@
+{
+  "name": "discord-bot",
+  "version": "1.0.0",
+  "description": "Discord bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Eyeballcode",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/opus": "^0.1.0",
+    "async": "^3.2.0",
+    "bufferutil": "^4.0.1",
+    "discord.js": "^12.2.0",
+    "erlpack": "github:discordapp/erlpack",
+    "ffmpeg-static": "^4.2.2",
+    "moment": "^2.26.0",
+    "moment-timezone": "^0.5.31",
+    "node-ical": "^0.10.0",
+    "node-wav": "0.0.2",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.5",
+    "sodium": "^3.0.2",
+    "utf-8-validate": "^5.0.2",
+    "wav": "^1.0.2",
+    "zlib-sync": "^0.1.6"
+  }
+}
