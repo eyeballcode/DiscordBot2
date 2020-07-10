@@ -13,7 +13,6 @@ require('moment-timezone')
 
 let patternCache = new TimedCache(1000 * 60 * 3)
 
-
 function transformDeparture(departure) {
   if (departure.route_id === 13) { // stony point
     if (departure.stop_id === 1073) { // frankston
