@@ -9,29 +9,9 @@ const fs = require('fs')
 const moment = require('moment')
 const path = require('path')
 const wav = require('node-wav')
+const generateAudioPattern = require('./GenerateAudioPattern')
 require('moment-timezone')
 
-let northernGroup = [
-  'Craigieburn',
-  'Sunbury',
-  'Upfield',
-  'Werribee',
-  'Williamstown',
-  'Showgrounds/Flemington'
-]
-
-let crossCityGroup = [
-  'Werribee',
-  'Williamstown',
-  'Frankston'
-]
-
-let gippslandLines = [
-  'Bairnsdale',
-  'Traralgon'
-]
-
-let cityLoopStations = ['Southern Cross', 'Parliament', 'Flagstaff', 'Melbourne Central']
 let patternCache = new TimedCache(1000 * 60 * 3)
 
 module.exports = class StationMonitor {
@@ -47,9 +27,10 @@ module.exports = class StationMonitor {
 
     this.currentlyReading = []
 
-    let files = fs.readdirSync(__dirname).filter(e => e.endsWith('.wav'))
+    let audioPath = path.join(__dirname, 'audio-out')
+    let files = fs.readdirSync(audioPath).filter(e => e.endsWith('.wav'))
     files.forEach(file => {
-      let filePath = path.join(__dirname, file)
+      let filePath = path.join(audioPath, file)
       fs.unlinkSync(filePath)
     })
 
@@ -111,7 +92,9 @@ module.exports = class StationMonitor {
         ...messageData, 'tone/pause3', ...messageData
       ]
 
-      let outputFile = path.join(__dirname, `output-${nextDeparture.scheduledDepartureTime.format('HHmm')}-delay.wav`)
+
+      let audioPath = path.join(__dirname, 'audio-out')
+      let outputFile = path.join(audioPath, `output-${nextDeparture.scheduledDepartureTime.format('HHmm')}-delay.wav`)
 
       await this.writeAudio(data, outputFile)
       this.audioQueue.schedulePlay(outputFile)
@@ -145,225 +128,6 @@ module.exports = class StationMonitor {
 
   minutesDifference(time) {
     return (new Date(time) - new Date()) / 1000 / 60
-  }
-
-  async getStoppingPattern(runID, isUp, station) {
-    let patternPayload
-    let url = `/v3/pattern/run/${runID}/route_type/0?expand=stop`
-    if (!(patternPayload = patternCache.get(url))) {
-      patternPayload = await ptvAPI(url)
-      patternCache.set(url, patternPayload)
-    }
-    let departures = patternPayload.departures
-    let stops = patternPayload.stops
-
-    departures = departures.sort((a, b) => new Date(a.scheduled_departure_utc) - new Date(b.scheduled_departure_utc))
-
-    let stoppingPattern = departures.map(stop => stops[stop.stop_id].stop_name)
-
-    if (stoppingPattern.includes('Jolimont-MCG')) {
-      stoppingPattern[stoppingPattern.indexOf('Jolimont-MCG')] = 'Jolimont'
-    }
-
-    let fssIndex = stoppingPattern.indexOf('Flinders Street')
-    if (fssIndex !== -1) {
-      if (isUp) {
-        stoppingPattern = stoppingPattern.slice(0, fssIndex + 1)
-      } else {
-        let stopIndex = stoppingPattern.indexOf(station)
-        if (fssIndex < stopIndex) {
-          stopIndex = fssIndex
-        }
-        stoppingPattern = stoppingPattern.slice(stopIndex)
-      }
-    }
-
-    return stoppingPattern
-  }
-
-  getRouteStops(lineName) {
-    if (['Pakenham', 'Traralgon', 'Bairnsdale'].includes(lineName)) return lines.Gippsland
-    if (lineName === 'Cranbourne') return lines.Cranbourne
-    if (lineName === 'Belgrave') return lines.Belgrave
-    if (lineName === 'Lilydale') return lines.Lilydale
-    if (lineName === 'Alamein') return lines.Alamein
-    if (['Craigieburn', 'Seymour', 'Shepparton'].includes(lineName)) return lines.Shepparton
-    if (lineName === 'Albury') return lines.Albury
-    if (lineName === 'Maryborough') return lines.Maryborough
-    if (['Ballarat', 'Ararat'].includes(lineName)) return lines.Ararat
-    if (['Geelong', 'Warrnambool'].includes(lineName)) return lines.Warrnambool
-    if (lineName === 'Werribee') return lines.Werribee
-    if (lineName === 'Williamstown') return lines.Williamstown
-    if (lineName === 'Sandringham') return lines.Sandringham
-    if (lineName === 'Upfield') return lines.Upfield
-    if (['Frankston', 'Stony Point'].includes(lineName)) return lines['Stony Point']
-    if (['Sunbury', 'Bendigo', 'Echuca'].includes(lineName)) return lines.Echuca
-    if (lineName === 'Swan Hill') return lines['Swan Hill']
-    if (lineName === 'Glen Waverley') return lines['Glen Waverley']
-    if (lineName === 'Mernda') return lines.Mernda
-    if (lineName === 'Hurstbridge') return lines.Hurstbridge
-  }
-
-  getExpressParts(stoppingPattern, relevantStops) {
-    let expressParts = []
-
-    let lastMainMatch = 0
-    let expressStops = 0
-
-    for (let scheduledStop of stoppingPattern) {
-      let matchIndex = -1
-
-      for (let stop of relevantStops) {
-        matchIndex++
-
-        if (stop === scheduledStop) {
-
-          if (matchIndex !== lastMainMatch) { // there has been a jump - exp section
-            let expressPart = relevantStops.slice(lastMainMatch, matchIndex)
-            expressParts.push(expressPart)
-          }
-
-          lastMainMatch = matchIndex + 1
-          break
-        }
-      }
-    }
-
-    return expressParts
-  }
-
-  getRelevantRouteStops(routeName, stoppingPattern, isUp, station) {
-    let routeStops = this.getRouteStops(routeName).slice(0)
-
-    if (isUp) routeStops.reverse()
-
-    let viaCityLoop = stoppingPattern.includes('Parliament') || stoppingPattern.includes('Flagstaff')
-
-    if (viaCityLoop) {
-      let cityLoopStops = stoppingPattern.filter(e => cityLoopStations.includes(e))
-      routeStops = routeStops.filter(e => !cityLoopStations.includes(e))
-
-      if (isUp) {
-        routeStops = routeStops.slice(0, -1).concat(cityLoopStops)
-        routeStops.push('Flinders Street')
-      } else {
-        routeStops = ['Flinders Street', ...cityLoopStops, ...routeStops.slice(1)]
-      }
-    } else {
-      routeStops = routeStops.filter(stop => !cityLoopStations.includes(stop))
-      if (northernGroup.includes(routeName)) {
-        if (isUp) {
-          routeStops = [...routeStops.slice(0, -1), 'Southern Cross', 'Flinders Street']
-        } else {
-          routeStops = ['Flinders Street', 'Southern Cross', ...routeStops.slice(1)]
-        }
-      }
-    }
-
-    let startIndex = stoppingPattern.indexOf(station)
-    stoppingPattern = stoppingPattern.slice(startIndex)
-
-    let stillViaCityLoop = stoppingPattern.includes('Parliament') || stoppingPattern.includes('Flagstaff')
-
-    let routeStartIndex = routeStops.indexOf(station)
-    let routeEndIndex = routeStops.indexOf(stoppingPattern.slice(-1)[0])
-
-    let relevantStops = routeStops.slice(routeStartIndex, routeEndIndex + 1)
-
-    return { stoppingPattern, relevantStops, viaCityLoop: stillViaCityLoop }
-  }
-
-  generateAudioPattern(expressParts, relevantStops, destination, viaCityLoop, station) {
-    let pattern = []
-    if (expressParts.length === 0) {
-      pattern.push('item/item42')
-      if (viaCityLoop) {
-        pattern.push(`station/phr/${stationCodes[destination]}_phr`)
-        pattern.push('item/item15')
-      } else {
-        pattern.push(`station/sen/${stationCodes[destination]}_sen`)
-      }
-
-      return pattern
-    } else if (expressParts.length === 1 && expressParts[0].length === 1) {
-      pattern.push('item/item42')
-      if (viaCityLoop) {
-        pattern.push(`station/phr/${stationCodes[destination]}_phr`)
-        pattern.push(`station/exc/${stationCodes[expressParts[0][0]]}_exc`)
-        pattern.push('item/item15')
-      } else {
-        pattern.push(`station/phr/${stationCodes[destination]}_phr`)
-        pattern.push(`station/exc/${stationCodes[expressParts[0][0]]}_exc`)
-      }
-
-      return pattern
-    }
-
-    let lastStop
-
-    expressParts.forEach((expressSector, i) => {
-      let firstExpressStop = expressSector[0]
-      let lastExpressStop = expressSector.slice(-1)[0]
-
-      let previousStopIndex = relevantStops.indexOf(firstExpressStop) - 1
-      let nextStopIndex = relevantStops.indexOf(lastExpressStop) + 1
-
-      let previousStop = relevantStops[previousStopIndex]
-      let nextStop = relevantStops[nextStopIndex]
-
-      if (lastStop) {
-        let lastStopIndex = relevantStops.indexOf(lastStop)
-
-        if (i === expressParts.length - 1 && nextStop === destination) {
-          pattern.push('item/item48')
-          if (lastStopIndex !== previousStopIndex) {
-            pattern.push('item/item10')
-          }
-          pattern.push(`station/flt/${stationCodes[previousStop]}_flt`)
-          pattern.push(`station/phr/${stationCodes[nextStop]}_phr`)
-        } else if (lastStop === previousStop) {
-          pattern.push(`station/flt/${stationCodes[previousStop]}_flt`)
-          pattern.push(`station/phr/${stationCodes[nextStop]}_phr`)
-        } else if (lastStopIndex + 1 == previousStopIndex) {
-          pattern.push('item/item10')
-          pattern.push(`station/flt/${stationCodes[previousStop]}_flt`)
-          pattern.push(`station/phr/${stationCodes[nextStop]}_phr`)
-        } else {
-          pattern.push('item/item42')
-          pattern.push(`station/phr/${stationCodes[previousStop]}_phr`)
-          pattern.push('item/item10')
-          pattern.push(`station/flt/${stationCodes[previousStop]}_flt`)
-          pattern.push(`station/phr/${stationCodes[nextStop]}_phr`)
-        }
-      } else {
-        if (station === previousStop) {
-          pattern.push('item/item10')
-          pattern.push(`station/flt/${stationCodes[previousStop]}_flt`)
-          pattern.push(`station/phr/${stationCodes[nextStop]}_phr`)
-        } else {
-          pattern.push('item/item42')
-          pattern.push(`station/phr/${stationCodes[previousStop]}_phr`)
-          pattern.push('item/item10')
-          pattern.push(`station/flt/${stationCodes[previousStop]}_flt`)
-          pattern.push(`station/phr/${stationCodes[nextStop]}_phr`)
-        }
-      }
-
-      lastStop = nextStop
-    })
-
-    if (relevantStops[relevantStops.indexOf(lastStop)] !== destination) {
-      pattern.push('item/item48')
-      pattern.push('item/item42')
-      if (viaCityLoop) {
-        pattern.push(`station/phr/${stationCodes[destination]}_phr`)
-        pattern.push('item/item15')
-      } else {
-        pattern.push(`station/sen/${stationCodes[destination]}_sen`)
-      }
-    }
-
-    return pattern
   }
 
   getMinutesPastMidnight(time) {
@@ -485,7 +249,8 @@ module.exports = class StationMonitor {
       ...serviceData, 'tone/pause3', 'item/qitem14'
     ]
 
-    let outputFile = path.join(__dirname, `output-${station}-${scheduledDepartureTime.format('HHmm')}-${destination}.wav`)
+    let audioPath = path.join(__dirname, 'audio-out')
+    let outputFile = path.join(audioPath, `output-${station}-${scheduledDepartureTime.format('HHmm')}-${destination}.wav`)
 
     if (!this.currentlyReading.includes(outputFile))
       await this.writeAudio(fullPattern, outputFile)
@@ -510,18 +275,14 @@ module.exports = class StationMonitor {
       let runID = nextDeparture.run_id
       let routeName = routes[nextDeparture.route_id].route_name
 
-      let isUp = nextDeparture.direction_id === 1
-      if (nextDeparture.route_id === '13') { // Stony point
-        isUp = nextDeparture.direction_id === 5
+      let patternPayload
+      let url = `/v3/pattern/run/${runID}/route_type/0?expand=stop&expand=route`
+      if (!(patternPayload = patternCache.get(url))) {
+        patternPayload = await ptvAPI(url)
+        patternCache.set(url, patternPayload)
       }
 
-      let rawStoppingPattern = await this.getStoppingPattern(runID, isUp, this.station)
-      let { stoppingPattern, relevantStops, viaCityLoop } = this.getRelevantRouteStops(routeName, rawStoppingPattern, isUp, this.station)
-      let expressParts = this.getExpressParts(stoppingPattern, relevantStops)
-
-      let destination = stoppingPattern.slice(-1)[0]
-
-      let audioPattern = this.generateAudioPattern(expressParts, relevantStops, destination, viaCityLoop, this.station)
+      let { audioPattern, destination, viaCityLoop } = generateAudioPattern(patternPayload, this.station)
 
       let announcedDestination = (destination === 'Flinders Street' && viaCityLoop) ? 'City Loop' : destination
 
