@@ -1,7 +1,7 @@
 const ptvAPI = require('./ptv-api')
 const audioConfig = require('../../data/audio')
-const stationCodes = require('./station-codes')
-const stopGTFSIDs = require('./stations')
+const stationCodes = require('../../data/station-codes')
+const stopGTFSIDs = require('../../data/stations')
 const TimedCache = require('../../TimedCache')
 const generateAudioPattern = require('./GenerateAudioPattern')
 const async = require('async')
@@ -89,7 +89,7 @@ function writeFile(file, data) {
 }
 
 async function writeAudio(pattern, outputFile) {
-  let fileData = await async.map(pattern.concat(['tone/pause3', 'tone/dtmf_s', 'tone/dtmf_s']), async name => {
+  let fileData = await async.map([...pattern, 'tone/pause3', 'tone/dtmf_s', 'tone/dtmf_s'], async name => {
     let filePath = path.join(audioConfig.audio_path, name + '.wav')
     let fileData = await readFile(filePath)
     let result = wav.decode(fileData)
@@ -180,8 +180,9 @@ module.exports = async (station, platform, bot) => {
       fullAudio = [
         'item/qitem20',
         `station/dst/${stationCodes[station]}_dst`,
+        'tone/pause2',
         `platform/name/eos/plteos${platform < 10 ? '0' + platform : platform}`,
-        'tone/pause1',
+        'tone/pause2',
         'item/qitem30'
       ]
     } else {
@@ -206,8 +207,10 @@ module.exports = async (station, platform, bot) => {
       voiceConnection.disconnect()
     })
   } catch (e) {
-    let dispatcher = voiceConnection.play(path.join(audioConfig.audio_path, 'item', 'qitem32'))
+    let dispatcher = voiceConnection.play(path.join(audioConfig.audio_path, 'item', 'qitem32.wav'))
 
-    dispatcher.on('finish', voiceConnection.disconnect)
+    dispatcher.on('finish', () => {
+      voiceConnection.disconnect()
+    })
   }
 }

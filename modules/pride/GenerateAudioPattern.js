@@ -1,5 +1,5 @@
-const lines = require('./LineData')
-const stationCodes = require('./station-codes')
+const lines = require('../../data/lines')
+const stationCodes = require('../../data/station-codes')
 
 let northernGroup = [
   'Craigieburn',

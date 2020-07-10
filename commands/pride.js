@@ -1,6 +1,6 @@
 const audioConfig = require('../data/audio')
 const PrideAudioAnnouncer = require('../modules/pride/PrideAudioAnnouncer')
-const stationCodeLookup = require('../modules/pride/station-codes-lookup')
+const stationCodeLookup = require('../data/station-codes-lookup')
 
 module.exports = {
   name: 'pride',

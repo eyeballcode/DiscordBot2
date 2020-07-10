@@ -1,6 +1,6 @@
 const audioConfig = require('../data/audio')
 const PrideBrick = require('../modules/pride/PrideBrick')
-const stationCodeLookup = require('../modules/pride/station-codes-lookup')
+const stationCodeLookup = require('../data/station-codes-lookup')
 
 module.exports = {
   name: 'pride_brick',
