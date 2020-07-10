@@ -133,7 +133,7 @@ module.exports = async (station, platform, bot) => {
 
     let nextDepartures = departures.filter(e => e.platform_number !== 'RRB').sort((a, b) => new Date(a.actual_departure_utc) - new Date(b.actual_departure_utc)).slice(0, 4)
 
-    let departureAudioFiles = await async.map(nextDepartures, async nextDeparture => {
+    let departureAudioFiles = (await async.map(nextDepartures, async nextDeparture => {
       if (minutesDifference(nextDeparture.actual_departure_utc) > 59) return null
 
       let runID = nextDeparture.run_id
@@ -172,7 +172,7 @@ module.exports = async (station, platform, bot) => {
       let fullAudio = [...serviceName, ...audioPattern, 'tone/pause2', ...departingInAudio]
 
       return fullAudio
-    })
+    })).filter(Boolean)
 
     let fullAudio
 
