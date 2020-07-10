@@ -17,7 +17,7 @@ module.exports = {
           delete global.prideAnnouncer
 
           if (stationCode === 'disable') return msg.reply('Disabled PRIDE Announcer')
-        }
+        } else if (stationCode === 'disable') return msg.reply('Disabled PRIDE Announcer')
 
         let fullStationName = stationCodeLookup[stationCode]
         if (!fullStationName) return msg.reply('Sorry, that is an invalid station code')
