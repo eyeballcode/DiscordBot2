@@ -3,3 +3,4 @@
 /config.json
 *.wav
 /load-classes/https
+/data/audio.json
