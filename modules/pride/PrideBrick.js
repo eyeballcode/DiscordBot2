@@ -117,91 +117,97 @@ async function writeAudio(pattern, outputFile) {
 
 
 module.exports = async (station, platform, bot) => {
-  let url = `/v3/departures/route_type/0/stop/${stopGTFSIDs[station]}?gtfs=true&max_results=2&expand=run&expand=route&platform_numbers=${platform}`
-  let departurePayload = await ptvAPI(url)
-
-  let departures = departurePayload.departures.map(transformDeparture)
-
-  let runs = departurePayload.runs
-  let routes = departurePayload.routes
-
-  let nextDepartures = departures.filter(e => e.platform_number !== 'RRB').sort((a, b) => new Date(a.actual_departure_utc) - new Date(b.actual_departure_utc)).slice(0, 4)
-
-  let departureAudioFiles = await async.map(nextDepartures, async nextDeparture => {
-    if (minutesDifference(nextDeparture.actual_departure_utc) > 59) return null
-
-    let runID = nextDeparture.run_id
-    let routeName = routes[nextDeparture.route_id].route_name
-
-    let patternPayload
-    let url = `/v3/pattern/run/${runID}/route_type/0?expand=stop&expand=route`
-    if (!(patternPayload = patternCache.get(url))) {
-      patternPayload = await ptvAPI(url)
-      patternCache.set(url, patternPayload)
-    }
-
-    let { audioPattern, destination, viaCityLoop } = generateAudioPattern(patternPayload, station)
-    let announcedDestination = (destination === 'Flinders Street' && viaCityLoop) ? 'City Loop' : destination
-
-    let scheduledDepartureTime = moment.tz(nextDeparture.scheduled_departure_utc, 'Australia/Melbourne')
-
-    let departingInAudio = ['item/item47', `platform/name/eos/plteos${platform < 10 ? '0' + platform : platform}`]
-
-    if (nextDeparture.estimated_departure_utc) {
-      let minutesToDeparture = minutesDifference(nextDeparture.estimated_departure_utc)
-
-      if (minutesToDeparture < 1) {
-        departingInAudio = ['item/item34']
-      } else {
-        let rounded = Math.round(minutesToDeparture)
-        departingInAudio = [
-          'item/item47',
-          `time/dept_min/dep${rounded < 10 ? '0' + rounded : rounded}_m`
-        ]
-      }
-    }
-
-    let serviceName = getServiceNameFiles(scheduledDepartureTime, announcedDestination)
-
-    let fullAudio = [...serviceName, ...audioPattern, 'tone/pause2', ...departingInAudio]
-
-    return fullAudio
-  })
-
-  let fullAudio
-
-  if (departureAudioFiles.length === 0) {
-    fullAudio = [
-      'item/qitem20',
-      `station/dst/${stationCodes[station]}_dst`,
-      `platform/name/eos/plteos${platform < 10 ? '0' + platform : platform}`,
-      'tone/pause1',
-      'item/qitem30'
-    ]
-  } else {
-    fullAudio = [
-      'item/item49',
-      `station/dst/${stationCodes[station]}_dst`,
-      `platform/name/ctr/pltctr${platform < 10 ? '0' + platform : platform}`,
-      'item/are',
-      'tone/pause2',
-      ...(departureAudioFiles).reduce((a, e) => [...a, ...e, 'tone/pause3'], []),
-      'item/qitem14'
-    ]
-  }
-
-  let outputFile = path.join(__dirname, 'audio-out', `output-${station}-brick.wav`)
-  writeAudio(fullAudio, outputFile)
-
-
   let server = bot.guilds.cache.find(guild => guild.name === audioConfig.server_name)
   let voiceChannel = server.channels.cache.find(channel => channel.name === audioConfig.channel_name)
 
   let voiceConnection = await voiceChannel.join()
-  let dispatcher = voiceConnection.play(outputFile)
 
-  dispatcher.on('finish', () => {
-    fs.unlink(outputFile, e => {})
-    voiceConnection.disconnect()
-  })
+  try {
+    let url = `/v3/departures/route_type/0/stop/${stopGTFSIDs[station]}?gtfs=true&max_results=2&expand=run&expand=route&platform_numbers=${platform}`
+    let departurePayload = await ptvAPI(url)
+
+    let departures = departurePayload.departures.map(transformDeparture)
+
+    let runs = departurePayload.runs
+    let routes = departurePayload.routes
+
+    let nextDepartures = departures.filter(e => e.platform_number !== 'RRB').sort((a, b) => new Date(a.actual_departure_utc) - new Date(b.actual_departure_utc)).slice(0, 4)
+
+    let departureAudioFiles = await async.map(nextDepartures, async nextDeparture => {
+      if (minutesDifference(nextDeparture.actual_departure_utc) > 59) return null
+
+      let runID = nextDeparture.run_id
+      let routeName = routes[nextDeparture.route_id].route_name
+
+      let patternPayload
+      let url = `/v3/pattern/run/${runID}/route_type/0?expand=stop&expand=route`
+      if (!(patternPayload = patternCache.get(url))) {
+        patternPayload = await ptvAPI(url)
+        patternCache.set(url, patternPayload)
+      }
+
+      let { audioPattern, destination, viaCityLoop } = generateAudioPattern(patternPayload, station)
+      let announcedDestination = (destination === 'Flinders Street' && viaCityLoop) ? 'City Loop' : destination
+
+      let scheduledDepartureTime = moment.tz(nextDeparture.scheduled_departure_utc, 'Australia/Melbourne')
+
+      let departingInAudio = ['item/item47', `platform/name/eos/plteos${platform < 10 ? '0' + platform : platform}`]
+
+      if (nextDeparture.estimated_departure_utc) {
+        let minutesToDeparture = minutesDifference(nextDeparture.estimated_departure_utc)
+
+        if (minutesToDeparture < 1) {
+          departingInAudio = ['item/item34']
+        } else {
+          let rounded = Math.round(minutesToDeparture)
+          departingInAudio = [
+            'item/item47',
+            `time/dept_min/dep${rounded < 10 ? '0' + rounded : rounded}_m`
+          ]
+        }
+      }
+
+      let serviceName = getServiceNameFiles(scheduledDepartureTime, announcedDestination)
+
+      let fullAudio = [...serviceName, ...audioPattern, 'tone/pause2', ...departingInAudio]
+
+      return fullAudio
+    })
+
+    let fullAudio
+
+    if (departureAudioFiles.length === 0) {
+      fullAudio = [
+        'item/qitem20',
+        `station/dst/${stationCodes[station]}_dst`,
+        `platform/name/eos/plteos${platform < 10 ? '0' + platform : platform}`,
+        'tone/pause1',
+        'item/qitem30'
+      ]
+    } else {
+      fullAudio = [
+        'item/item49',
+        `station/dst/${stationCodes[station]}_dst`,
+        `platform/name/ctr/pltctr${platform < 10 ? '0' + platform : platform}`,
+        'item/are',
+        'tone/pause2',
+        ...(departureAudioFiles).reduce((a, e) => [...a, ...e, 'tone/pause3'], []),
+        'item/qitem14'
+      ]
+    }
+
+    let outputFile = path.join(__dirname, 'audio-out', `output-${station}-brick.wav`)
+    await writeAudio(fullAudio, outputFile)
+
+    let dispatcher = voiceConnection.play(outputFile)
+
+    dispatcher.on('finish', () => {
+      fs.unlink(outputFile, e => {})
+      voiceConnection.disconnect()
+    })
+  } catch (e) {
+    let dispatcher = voiceConnection.play(path.join(audioConfig.audio_path, 'item', 'qitem32'))
+
+    dispatcher.on('finish', voiceConnection.disconnect)
+  }
 }

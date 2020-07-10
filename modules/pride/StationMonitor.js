@@ -32,8 +32,6 @@ module.exports = class StationMonitor {
       let filePath = path.join(audioPath, file)
       fs.unlinkSync(filePath)
     })
-
-    this.audioScheduler()
   }
 
   async audioScheduler() {
@@ -43,7 +41,10 @@ module.exports = class StationMonitor {
 
     this.nextDepartures.forEach(nextDeparture => {
       clearTimeout(this.monitorTimeouts[nextDeparture.runID])
-      let deviance = nextDeparture.estimatedDepartureTime - nextDeparture.scheduledDepartureTime
+      let deviance = 0
+      if (nextDeparture.estimatedDepartureTime)
+        deviance = nextDeparture.estimatedDepartureTime - nextDeparture.scheduledDepartureTime
+
       let msToSchDeparture = nextDeparture.scheduledDepartureTime - this.moment()
       let twoMinToSchDeparture = msToSchDeparture - 1000 * 60 * 2
 
@@ -289,7 +290,7 @@ module.exports = class StationMonitor {
 
       return {
         scheduledDepartureTime: this.moment(nextDeparture.scheduled_departure_utc),
-        estimatedDepartureTime: this.moment(nextDeparture.estimated_departure_utc),
+        estimatedDepartureTime: nextDeparture.estimated_departure_utc ? this.moment(nextDeparture.estimated_departure_utc) : null,
         destination: announcedDestination,
         outputFile,
         runID: nextDeparture.run_id,

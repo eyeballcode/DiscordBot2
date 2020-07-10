@@ -17,6 +17,7 @@ module.exports = class PrideAudioAnnouncer {
     this.audioQueue = new AudioQueue(this.voiceConnection)
 
     this.stationMonitor = new StationMonitor(this.station, this.platform, this.audioQueue)
+    await this.stationMonitor.audioScheduler()
   }
 
   async stop() {
