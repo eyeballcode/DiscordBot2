@@ -42,6 +42,7 @@ let server = https.createServer({
 
       classes = classes.concat(data)
       fs.writeFileSync(classPath, JSON.stringify(classes))
+      if (!data[0]) return res.end()
       console.log('recieved classes for', data[0].classCode, 'total', classes.length, 'classes')
 
       res.end()
