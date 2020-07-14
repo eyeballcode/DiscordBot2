@@ -7,7 +7,8 @@
     "JAZZCHOIR": "min sing but in jazz",
     "MIN_VOX": "min sing but she's alone",
     "RON_VOX": "min sing but he's alone",
-    "DEFAULT": "min die in {}"
+    "DEFAULT": "min die in {}",
+    "11PSTY": "min waste time in study"
   },
   "classNames": {
     "11SMPA": "comp",
