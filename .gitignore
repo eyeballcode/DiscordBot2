@@ -4,3 +4,4 @@
 *.wav
 /load-classes/https
 /data/audio.json
+/data/myki.json
