@@ -1,14 +1,13 @@
 {
-  "tracking": 11773,
+  "tracking": 11960,
   "classFormat": {
     "MENTDY": "trainsssssssss",
-    "NO_CLASS": "min waste time",
-    "CHOIR": "min sing",
-    "JAZZCHOIR": "min sing but in jazz",
-    "MIN_VOX": "min sing but she's alone",
-    "RON_VOX": "min sing but he's alone",
-    "DEFAULT": "min die in {}",
-    "11PSTY": "min waste time in study"
+    "NO_CLASS": "ron waste time",
+    "CHOIR": "ron sing",
+    "JAZZCHOIR": "ron sing but in jazz",
+    "RON_VOX": "ron sing but he's alone",
+    "DEFAULT": "ron die in {}",
+    "11PSTY": "ron waste time in study"
   },
   "classNames": {
     "11SMPA": "comp",
