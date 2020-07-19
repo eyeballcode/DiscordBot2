@@ -5,18 +5,18 @@ const moment = require('moment')
 
 let channel
 
-let sevenPm = moment().endOf('day').subtract(5, 'hours')
-let difference = sevenPm - moment()
+let sixPm = moment().endOf('day').subtract(6, 'hours')
+let difference = sixPm - moment()
 if (difference < 0) difference += 1440 * 60 * 1000
 
 let users = Object.keys(mykiCards)
 
 function checkCards(channel) {
-  users.forEach(user => {
+  users.forEach(async user => {
     let parts = user.split('#')
     let mykiCard = mykiCards[user]
 
-    let data = JSON.parse(await request(`https://mykiapi.ptv.vic.gov.au/myki/card/${userMyki}`))
+    let data = JSON.parse(await request(`https://mykiapi.ptv.vic.gov.au/myki/card/${mykiCard}`))
     let balance = parseFloat(data.mykiBalance)
 
     if (balance <= 6) {

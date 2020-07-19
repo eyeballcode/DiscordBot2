@@ -9,16 +9,18 @@ module.exports = {
       let url
       if (mode === 'service') {
         if (!arg) return msg.reply('You need to specify a service number')
-        url = `https://vic.transportsg.me/tracker2/bus-bot?service=${args[1]}`
+        url = `https://vic.transportsg.me/bus/tracker/bot?service=${args[1]}`
       } else if (mode === 'bus') {
         if (!arg) return msg.reply('You need to specify a fleet number')
-        url = `https://vic.transportsg.me/tracker2/bus-bot?fleet=${args[1]}`
-      }
+        url = `https://vic.transportsg.me/bus/tracker/bot?fleet=${args[1]}`
+      } else return msg.reply('That doesn\'t look like a valid mode')
 
       let data = JSON.parse(await request(url))
 
       let lines = data.map(trip => {
-        return `${trip.fleetNumber ? trip.fleetNumber + ': ' : ''}${trip.departureTime} ${trip.origin} - ${trip.destination}`
+        let line = `${trip.fleetNumber ? trip.fleetNumber + ': ' : ''}${trip.departureTime} ${trip.origin} - ${trip.destination}`
+        if (mode === 'bus') line += ` ${trip.routeNumber}`
+        return line
       })
 
       let chunks = []
