@@ -4,6 +4,8 @@ let mykiCards = require('../data/myki.json')
 const TimedCache = require('../TimedCache')
 const fs = require('fs')
 const path = require('path')
+const moment = require('moment')
+require('moment-timezone')
 
 let mykiPath = path.join(__dirname, '../data/myki.json')
 let dataCache = new TimedCache(1000 * 60 * 10)
@@ -112,14 +114,46 @@ module.exports = {
         let topupPending = data.mykiBalanceIncludingPending - balance
         let cardType = cardTypes[data.passengerCode]
 
-        msg.reply(new MessageEmbed()
+        let embed = new MessageEmbed()
           .setTitle(`${target.username}'s Myki Details`)
           .addFields(
             { name: 'Balance', value: '$' + balance.toFixed(2), inline: true },
             { name: 'Expiry', value: expiry, inline: true },
             { name: 'Card Type', value: cardType, inline: true },
-            { name: 'Topup Pending', value: '$' + topupPending.toFixed(2), inline: true }
-        ))
+            { name: 'Topup Pending', value: '$' + topupPending.toFixed(2) }
+        )
+
+        if (data.Product.length) {
+          let pass = data.Product[0]
+          let expiry = moment.tz(pass.lastUtilizationDate, 'Australia/Melbourne')
+          let now = moment.tz('Australia/Melbourne')
+
+          let difference = moment.duration(expiry.diff(now))
+
+          let years = Math.abs(difference.years())
+          let months = Math.abs(difference.months())
+          let days = Math.abs(difference.days())
+
+          let hours = Math.abs(difference.hours())
+          let minutes = Math.abs(difference.minutes())
+
+          let joining = []
+          if (years) joining.push(years + ' years')
+          if (months) joining.push(months + ' months')
+          if (days) joining.push(days + ' days')
+
+          if (!joining.length) {
+            joining.push(hours + 'hours')
+            joining.push(minutes + 'minutes')
+          }
+
+          embed.addFields(
+            { name: 'Myki Pass Zones', value: `${pass.zoneMin} - ${pass.zoneMax}`, inline: true },
+            { name: 'Myki Pass Expiry', value: joining.join(', '), inline: true }
+          )
+        }
+
+        msg.reply(embed)
       } else {
         msg.reply('Sorry, I don\'t know your myki')
       }
