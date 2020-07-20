@@ -38,13 +38,13 @@ function checkCards(channel) {
 
     let targetUser = channel.guild.members.cache.find(user => user.user.username === parts[0] && user.user.discriminator === parts[1])
     if (expiringMykiPass && lowBalance) {
-      channel.send(`${targetUser}, Your myki pass will be expiring soon and your balance $${balance.toFixed(2)} of is running low. Remember to topup your myki!
+      channel.send(`${targetUser}, Your myki pass will be expiring soon and your balance ${balance < 0 ? '-$' : '$'}${Math.abs(balance.toFixed(2))} of is running low. Remember to topup your myki!
 You can topup here https://www.ptv.vic.gov.au/mykitopup/`)
     } else if (expiringMykiPass) {
       channel.send(`${targetUser}, Your myki pass will be expiring soon. Remember to topup your myki!
 You can topup here https://www.ptv.vic.gov.au/mykitopup/`)
     } else if (lowBalance && !hasPassCovering) {
-      channel.send(`${targetUser}, Your myki has a balance of $${balance.toFixed(2)}. Remember to topup your myki!
+      channel.send(`${targetUser}, Your myki has a balance of ${balance < 0 ? '-$' : '$'}${Math.abs(balance.toFixed(2))}. Remember to topup your myki!
 You can topup here https://www.ptv.vic.gov.au/mykitopup/`)
     }
   })

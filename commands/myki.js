@@ -117,7 +117,7 @@ module.exports = {
         let embed = new MessageEmbed()
           .setTitle(`${target.username}'s Myki Details`)
           .addFields(
-            { name: 'Balance', value: '$' + balance.toFixed(2), inline: true },
+            { name: 'Balance', value: `${balance < 0 ? '-$' : '$'}${Math.abs(balance.toFixed(2))}`, inline: true },
             { name: 'Expiry', value: expiry, inline: true },
             { name: 'Card Type', value: cardType, inline: true },
             { name: 'Topup Pending', value: '$' + topupPending.toFixed(2) }
