@@ -24,8 +24,9 @@ function checkCards(channel) {
 
     let lowBalance = balance <= 6
     let expiringMykiPass = false
+    let hasPassCovering = data.Product.length > 0
 
-    if (data.Product.length) {
+    if (hasPassCovering) {
       let pass = data.Product[0]
       let nextPass = data.Product[1]
       let expiry = moment.tz(pass.lastUtilizationDate, 'Australia/Melbourne')
@@ -42,7 +43,7 @@ You can topup here https://www.ptv.vic.gov.au/mykitopup/`)
     } else if (expiringMykiPass) {
       channel.send(`${targetUser}, Your myki pass will be expiring soon. Remember to topup your myki!
 You can topup here https://www.ptv.vic.gov.au/mykitopup/`)
-    } else if (lowBalance) {
+    } else if (lowBalance && !hasPassCovering) {
       channel.send(`${targetUser}, Your myki has a balance of $${balance.toFixed(2)}. Remember to topup your myki!
 You can topup here https://www.ptv.vic.gov.au/mykitopup/`)
     }
