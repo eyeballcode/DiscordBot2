@@ -11,6 +11,8 @@ module.exports = bot => {
     let member = newPresence.member
     if (member.user.id === bot.user.id) return
 
+    if (oldPresence.activities.length === activities.length) return
+
     if (guild.id === server.id && activities.length) {
       let activity = activities[0]
       let {name} = activity
