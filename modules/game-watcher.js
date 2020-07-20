@@ -17,6 +17,7 @@ module.exports = bot => {
 
       let activityType = activity.type.toString()
 
+      if (activityType === 'CUSTOM_STATUS') return
       if (activityType === 'LISTENING') {
         channel.send(`Attention! ${member} has just started listening to ${name}`)
       } else {
