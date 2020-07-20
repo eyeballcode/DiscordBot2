@@ -24,7 +24,7 @@ function checkCards(channel) {
 
     let lowBalance = balance <= 6
     let expiringMykiPass = false
-    let hasPassCovering = data.Product.length > 0
+    let hasPassCovering = data.Product && data.Product.length > 0
 
     if (hasPassCovering) {
       let pass = data.Product[0]

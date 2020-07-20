@@ -123,7 +123,7 @@ module.exports = {
             { name: 'Topup Pending', value: '$' + topupPending.toFixed(2) }
         )
 
-        if (data.Product.length) {
+        if (data.Product && data.Product.length) {
           let pass = data.Product[0]
           let expiry = moment.tz(pass.lastUtilizationDate, 'Australia/Melbourne')
           let now = moment.tz('Australia/Melbourne')
