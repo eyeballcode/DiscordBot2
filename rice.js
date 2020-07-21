@@ -14,6 +14,7 @@ async function handleError(e) {
   if (e.statusCode === 429) {
     console.log('Been rate limited, sleeping 5min')
     await sleep(1000 * 60 * 5)
+    process.exit()
   } else {
     console.log(e)
   }
