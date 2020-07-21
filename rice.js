@@ -127,44 +127,44 @@ function sleep(time=sleepTime) {
 }
 
 async function main() {
-  await getGame()
-  let question = await levelUp()
+  try {
+    await getGame()
+    let question = await levelUp()
 
-  category = question.data.attributes.category
-  level = question.data.attributes.level
+    category = question.data.attributes.category
+    level = question.data.attributes.level
 
-  while (true) {
-    let questionID = question.question_id
-    let answer = solve(question)
-    let answerID = 'a' + answer
-    question = await answerQuestion(questionID, answerID)
+    while (true) {
+      let questionID = question.question_id
+      let answer = solve(question)
+      let answerID = 'a' + answer
+      question = await answerQuestion(questionID, answerID)
 
-    if (question.errors) {
-      let title = question.errors[0].title
-      if (title.startsWith('No Question is available for this game.')) {
-        question = await levelUp()
-        if (!question.data) {
-          console.log('No question again?')
+      if (question.errors) {
+        let title = question.errors[0].title
+        if (title.startsWith('No Question is available for this game.')) {
           question = await levelUp()
+          if (!question.data) {
+            console.log('No question again?')
+            question = await levelUp()
+          }
+          category = question.data.attributes.category
+          level = question.data.attributes.level
+          console.log('Level Up', level)
+        } else if (title === 'No Question is set for this game') {
+          question = await levelUp()
+
+          category = question.data.attributes.category
+          level = question.data.attributes.level
+
+          console.log('Out of questions')
         }
-        category = question.data.attributes.category
-        level = question.data.attributes.level
-        console.log('Level Up', level)
-      } else if (title === 'No Question is set for this game') {
-        question = await levelUp()
-
-        category = question.data.attributes.category
-        level = question.data.attributes.level
-
-        console.log('Out of questions')
       }
+      await sleep()
     }
-    await sleep()
+  } catch (e) {
+    process.exit()
   }
 }
 
-try {
-  await main()
-} catch (e) {
-  process.exit()
-}
+main()
