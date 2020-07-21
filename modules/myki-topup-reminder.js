@@ -14,12 +14,26 @@ if (difference < 0) difference += 1440 * 60 * 1000
 
 let users = Object.keys(mykiCards)
 
+async function getBalance(mykiCard) {
+  for (let i = 0; i < 4; i++) {
+    try {
+      let data = JSON.parse(await request(`https://mykiapi.ptv.vic.gov.au/myki/card/${mykiCard}`))
+      return data
+    } catch (e) {
+      return { errored: true }
+    }
+  }
+}
+
 function checkCards(channel) {
   users.forEach(async user => {
     let parts = user.split('#')
     let mykiCard = mykiCards[user]
 
-    let data = JSON.parse(await request(`https://mykiapi.ptv.vic.gov.au/myki/card/${mykiCard}`))
+    let data = await getBalance(mykiCard)
+    if (data.errored) {
+      return channel.send(`Sorry ${targetUser}, failed to check your myki balance`)
+    }
     let balance = parseFloat(data.mykiBalance)
 
     let lowBalance = balance <= 6
