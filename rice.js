@@ -10,6 +10,16 @@ let headers = { 'Content-Type': 'application/json', 'User-Agent': userAgent }
 
 let sleepTime = 3500
 
+async function loadAdvert() {
+  let dom = await JSDOM.fromURL('https://freerice.com/assets/ads/rubicon-correct-mobile.html', {
+    referrer: 'https://freerice.com/',
+    includeNodeLocations: true,
+    runScripts: 'dangerously',
+    pretendToBeVisual: true,
+    resources: 'usable'
+  })
+}
+
 async function handleError(e) {
   if (e.statusCode === 429) {
     console.log('Been rate limited, sleeping 5min')
@@ -69,6 +79,8 @@ async function answerQuestion(question, answer) {
       let data = JSON.parse(body)
       if (!data) console.log(body)
       if (!data.data.attributes) throw new Error('')
+      loadAdvert()
+
       return data
     } catch (e) { await handleError(e) }
   }
@@ -148,16 +160,3 @@ async function main() {
 }
 
 main()
-
-async function loadAdvert() {
-  let dom = await JSDOM.fromURL('https://freerice.com/assets/ads/rubicon-correct-mobile.html', {
-    referrer: 'https://freerice.com/',
-    includeNodeLocations: true,
-    runScripts: 'dangerously',
-    pretendToBeVisual: true,
-    resources: 'usable'
-  })
-}
-
-setInterval(loadAdvert, sleepTime * 0.75)
-loadAdvert()
