@@ -11,13 +11,16 @@ let headers = { 'Content-Type': 'application/json', 'User-Agent': userAgent }
 let sleepTime = 5000
 
 async function loadAdvert() {
-  let dom = await JSDOM.fromURL('https://freerice.com/assets/ads/rubicon-correct-mobile.html', {
-    referrer: 'https://freerice.com/',
-    includeNodeLocations: true,
-    runScripts: 'dangerously',
-    pretendToBeVisual: true,
-    resources: 'usable'
-  })
+  try {
+    let dom = await JSDOM.fromURL('https://freerice.com/assets/ads/rubicon-correct-mobile.html', {
+      referrer: 'https://freerice.com/',
+      includeNodeLocations: true,
+      runScripts: 'dangerously',
+      pretendToBeVisual: true,
+      resources: 'usable'
+    })
+  } catch (e) {
+  }
 }
 
 async function handleError(e) {
