@@ -13,6 +13,7 @@ module.exports = bot => {
 
     let fullUser = `${user.username}#${user.discriminator}`
     if (!watcherSettings.users.includes(fullUser)) return
+    if (!oldPresence || !activities) return
 
     if (oldPresence.activities.length === activities.length) return
 
