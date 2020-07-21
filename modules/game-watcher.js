@@ -9,7 +9,10 @@ module.exports = bot => {
     let activities = newPresence.activities
 
     let member = newPresence.member
-    if (member.user.id === bot.user.id) return
+    let user = member.user
+
+    let fullUser = `${user.username}#${user.discriminator}`
+    if (!watcherSettings.includes(fullUser)) return
 
     if (oldPresence.activities.length === activities.length) return
 
