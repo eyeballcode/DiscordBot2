@@ -81,8 +81,9 @@ async function answerQuestion(question, answer) {
 
       let data = JSON.parse(body)
       if (!data) console.log(body)
+      if (!data.data) throw new Error('')
       if (!data.data.attributes) throw new Error('')
-      loadAdvert()
+      setTimeout(loadAdvert)
 
       return data
     } catch (e) { await handleError(e) }
