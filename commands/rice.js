@@ -8,10 +8,11 @@ let userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/605
 let headers = { 'Content-Type': 'application/json', 'User-Agent': userAgent }
 
 let groupIDs = {
-  'Flannery': 'e2607ee8-1417-4d65-a117-71d67ffef6d4',
-  'Wood': '48661266-a8dd-4628-bd2d-bed5bc56ef62',
-  'Blackburn': 'fe6dd032-c792-4b70-ae3c-af89ebe184a4',
-  'Doherty': '9f93e4a5-eecc-4dbe-a512-dc4754dee2bc'
+  'JMSS': 'de04e6ce-c6a7-4de5-891f-0bcd4ed3767d
+  // 'Flannery': 'e2607ee8-1417-4d65-a117-71d67ffef6d4',
+  // 'Wood': '48661266-a8dd-4628-bd2d-bed5bc56ef62',
+  // 'Blackburn': 'fe6dd032-c792-4b70-ae3c-af89ebe184a4',
+  // 'Doherty': '9f93e4a5-eecc-4dbe-a512-dc4754dee2bc'
 }
 
 module.exports = {
