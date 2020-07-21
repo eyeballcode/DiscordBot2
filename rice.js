@@ -164,7 +164,7 @@ async function main() {
 }
 
 try {
-  main()
+  await main()
 } catch (e) {
   process.exit()
 }
