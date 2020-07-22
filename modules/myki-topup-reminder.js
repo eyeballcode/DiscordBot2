@@ -8,21 +8,27 @@ let channel
 
 let now = moment.tz('Australia/Melbourne')
 
-let sixPm = now.clone().startOf('day').add(18, 'hours')
+let sixPm = now.clone().startOf('day').add(18, 'hours').add(15, 'seconds')
 let difference = sixPm - now
 if (difference < 0) difference += 1440 * 60 * 1000
 
 let users = Object.keys(mykiCards)
 
 async function getBalance(mykiCard) {
+  let error
   for (let i = 0; i < 3; i++) {
     try {
       let data = JSON.parse(await request(`https://mykiapi.ptv.vic.gov.au/myki/card/${mykiCard}`))
       return data
-    } catch (error) {
-      return { errored: true, error }
+    } catch (e) {
+      error = e
+      await new Promise(resolve => {
+        setTimeout(resolve, 1000)
+      })
     }
   }
+
+  return { errored: true, error }
 }
 
 function checkCards(channel) {
@@ -68,7 +74,7 @@ You can topup here https://www.ptv.vic.gov.au/mykitopup/`)
 module.exports = bot => {
   let server = bot.guilds.cache.find(server => server.name === mykiSettings.server_name)
   let channel = server.channels.cache.find(channel => channel.name === mykiSettings.channel_name)
-checkCards(channel)
+
   setTimeout(() => {
     checkCards(channel)
     setInterval(() => {
