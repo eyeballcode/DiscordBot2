@@ -15,12 +15,12 @@ if (difference < 0) difference += 1440 * 60 * 1000
 let users = Object.keys(mykiCards)
 
 async function getBalance(mykiCard) {
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 3; i++) {
     try {
       let data = JSON.parse(await request(`https://mykiapi.ptv.vic.gov.au/myki/card/${mykiCard}`))
       return data
-    } catch (e) {
-      return { errored: true }
+    } catch (error) {
+      return { errored: true, error }
     }
   }
 }
@@ -29,9 +29,11 @@ function checkCards(channel) {
   users.forEach(async user => {
     let parts = user.split('#')
     let mykiCard = mykiCards[user]
+    let targetUser = channel.guild.members.cache.find(user => user.user.username === parts[0] && user.user.discriminator === parts[1])
 
     let data = await getBalance(mykiCard)
     if (data.errored) {
+      console.log(user, data.error)
       return channel.send(`Sorry ${targetUser}, failed to check your myki balance`)
     }
     let balance = parseFloat(data.mykiBalance)
@@ -50,7 +52,6 @@ function checkCards(channel) {
       expiringMykiPass = difference <= 3 && !nextPass
     }
 
-    let targetUser = channel.guild.members.cache.find(user => user.user.username === parts[0] && user.user.discriminator === parts[1])
     if (expiringMykiPass && lowBalance) {
       channel.send(`${targetUser}, Your myki pass will be expiring soon and your balance ${balance < 0 ? '-$' : '$'}${Math.abs(balance.toFixed(2))} of is running low. Remember to topup your myki!
 You can topup here https://www.ptv.vic.gov.au/mykitopup/`)
@@ -67,7 +68,7 @@ You can topup here https://www.ptv.vic.gov.au/mykitopup/`)
 module.exports = bot => {
   let server = bot.guilds.cache.find(server => server.name === mykiSettings.server_name)
   let channel = server.channels.cache.find(channel => channel.name === mykiSettings.channel_name)
-
+checkCards(channel)
   setTimeout(() => {
     checkCards(channel)
     setInterval(() => {
