@@ -24,8 +24,8 @@ async function getWOTD() {
     let synonyms = Array.from($$('#synonyms-anchor ul:nth-child(3) li a').slice(0, 3)).map(e => $$(e).text()).join(', ')
 
     message = `${prettyWord}: ${definition}
-  *e.g: ${example}*
-  [synonyms: ${synonyms}]`
+*e.g: ${example}*
+[synonyms: ${synonyms}]`
 
     dataCache.set('W', message)
   }
