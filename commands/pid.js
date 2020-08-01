@@ -6,7 +6,7 @@ const fs = require('fs')
 let pidTypes = ['fss-escalator', 'fss-platform', 'half-platform', 'half-platform-bold', 'platform']
 
 async function render(fullStationName, platform, type) {
-  const browser = await puppeteer.launch()
+  const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']})
   const page = await browser.newPage()
 
   let fileName = `${fullStationName}-${platform}-${type}`.toLowerCase().replace(/[^\w\d ]/g, '-').replace(/  */g, '-').replace(/--+/g, '-').replace(/-$/, '').replace(/^-/, '') + '.png'
