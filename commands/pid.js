@@ -3,6 +3,8 @@ const stationCodeLookup = require('../data/station-codes-lookup')
 const { MessageAttachment } = require('discord.js')
 const fs = require('fs')
 
+let pidTypes = ['fss-escalator', 'fss-platform', 'half-platform', 'half-platform-bold', 'platform']
+
 async function render(fullStationName, platform, type) {
   const browser = await puppeteer.launch()
   const page = await browser.newPage()
@@ -37,6 +39,7 @@ module.exports = {
 
     let fullStationName = stationCodeLookup[stationCode]
     if (!fullStationName) return msg.reply('Sorry, that is an invalid station code')
+    if (!pidTypes.includes(type)) return msg.reply('Sorry, that is an invalid PID Type')
 
     msg.reply(`Rendering ${type} PID for ${fullStationName} Platform ${platform}`)
 
