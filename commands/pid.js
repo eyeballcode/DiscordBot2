@@ -11,11 +11,17 @@ async function render(fullStationName, platform, type) {
 
   let fileName = `${fullStationName}-${platform}-${type}`.toLowerCase().replace(/[^\w\d ]/g, '-').replace(/  */g, '-').replace(/--+/g, '-').replace(/-$/, '').replace(/^-/, '') + '.png'
 
+  let width = 3200
   let height = 1800
   if (type.includes('half')) height = 900
 
+  if (type === 'fss-escalator') {
+    width = 1800
+    height = 3200
+  }
+
   await page.setViewport({
-    width: 3200,
+    width,
     height,
     deviceScaleFactor: 2
   })
