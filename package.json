@@ -21,6 +21,7 @@
     "moment-timezone": "^0.5.31",
     "node-ical": "^0.10.0",
     "node-wav": "0.0.2",
+    "puppeteer": "^5.2.1",
     "request": "^2.88.2",
     "request-promise": "^4.2.5",
     "sodium": "^3.0.2",
