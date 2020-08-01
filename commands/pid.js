@@ -3,7 +3,7 @@ const stationCodeLookup = require('../data/station-codes-lookup')
 const { MessageAttachment } = require('discord.js')
 const fs = require('fs')
 
-let pidTypes = ['fss-escalator', 'fss-platform', 'half-platform', 'half-platform-bold', 'platform', 'sss-platform']
+let pidTypes = ['fss-escalator', 'fss-platform', 'half-platform', 'half-platform-bold', 'platform', 'sss-platform', 'sss-platform-new']
 
 async function render(fullStationName, platform, type) {
   const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']})
@@ -30,6 +30,9 @@ async function render(fullStationName, platform, type) {
   if (type === 'sss-platform') {
     url = `https://vic.transportsg.me/mockups/sss/platform/${platform}`
   }
+  if (type === 'sss-platform-new') {
+    url = `https://vic.transportsg.me/mockups/sss-new/platform/${platform}`
+  }
 
   await page.goto(url, { waitUntil: 'networkidle2' })
   await new Promise(resolve => setTimeout(resolve, 7500))
@@ -54,12 +57,12 @@ module.exports = {
     if (!fullStationName) return msg.reply('Sorry, that is an invalid station code')
     if (!platform) return msg.reply('Sorry, that is an invalid platform.')
     if (!pidTypes.includes(type)) return msg.reply('Sorry, that is an invalid PID Type')
-    if (type === 'sss-platform') {
+    if (type.includes('sss-')) {
       if (stationCode === 'SSS') {
         platform = platform + (platform % 2 - 1)
         platform = `${platform}-${platform + 1}`
       } else {
-        return msg.reply('Sorry, sss-platform must be used at SSS')
+        return msg.reply(`Sorry, ${type} must be used at SSS`)
       }
     }
 
