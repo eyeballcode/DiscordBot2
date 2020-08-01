@@ -51,7 +51,7 @@ module.exports = {
     let [stationCode, platform, type] = args
     if (!(stationCode && platform && type)) return msg.reply('Format: !pid stationCode platform type')
 
-    platform = parseInt(platform)
+    if (platform !== '*') platform = parseInt(platform)
 
     let fullStationName = stationCodeLookup[stationCode]
     if (!fullStationName) return msg.reply('Sorry, that is an invalid station code')
