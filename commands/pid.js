@@ -3,7 +3,13 @@ const stationCodeLookup = require('../data/station-codes-lookup')
 const { MessageAttachment } = require('discord.js')
 const fs = require('fs')
 
-let pidTypes = ['fss-escalator', 'fss-platform', 'half-platform', 'half-platform-bold', 'platform', 'sss-platform', 'sss-platform-new', 'trains-from-fss']
+let pidTypes = [
+  'fss-escalator', 'fss-platform',
+  'train-from-fss',
+  'half-platform', 'half-platform-bold', 'platform',
+  'sss-platform', 'sss-platform-new',
+  'conc-up-down', 'conc-interchange'
+]
 
 async function render(fullStationName, platform, type) {
   const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']})
@@ -15,7 +21,7 @@ async function render(fullStationName, platform, type) {
   let height = 1800
   if (type.includes('half')) height = 900
 
-  if (type === 'fss-escalator') {
+  if (type === 'fss-escalator' || type === 'conc-interchange') {
     width = 1800
     height = 3200
   }
@@ -36,9 +42,12 @@ async function render(fullStationName, platform, type) {
   if (type === 'trains-from-fss') {
     url = `https://vic.transportsg.me/mockups/fss/trains-from-fss`
   }
+  if (type.startsWith('conc-')) {
+    url = `https://vic.transportsg.me/mockups/get?station=${fullStationName}&concourseType=${type.slice(5)}&type=concourse`
+  }
 
   await page.goto(url, { waitUntil: 'networkidle2' })
-  await new Promise(resolve => setTimeout(resolve, 7000))
+  await new Promise(resolve => setTimeout(resolve, 3000))
 
   await page.screenshot({path: fileName})
 
@@ -74,6 +83,9 @@ module.exports = {
       if (stationCode !== 'FSS' || platform !== '*') {
         return msg.reply(`Sorry, trains-from-fss must be used at FSS with platform *`)
       }
+    }
+    if (type.startsWith('conc-') && platform !== '*') {
+      return msg.reply(`Sorry, ${type} must be used with platform *`)
     }
 
     msg.reply(`Rendering ${type} PID for ${fullStationName} Platform ${platform}`)
