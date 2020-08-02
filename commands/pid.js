@@ -7,9 +7,12 @@ let pidTypes = [
   'fss-escalator', 'fss-platform',
   'train-from-fss',
   'half-platform', 'half-platform-bold', 'platform',
+  'pre-platform-vertical',
   'sss-platform', 'sss-platform-new',
   'conc-up-down', 'conc-interchange'
 ]
+
+let verticalPIDs = ['fss-escalator', 'pre-platform-vertical', 'conc-interchange']
 
 async function render(fullStationName, platform, type) {
   const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']})
@@ -21,7 +24,7 @@ async function render(fullStationName, platform, type) {
   let height = 1800
   if (type.includes('half')) height = 900
 
-  if (type === 'fss-escalator' || type === 'conc-interchange') {
+  if (verticalPIDs.includes(type)) {
     width = 1800
     height = 3200
   }
