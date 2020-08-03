@@ -9,7 +9,8 @@ let pidTypes = [
   'half-platform', 'half-platform-bold', 'platform',
   'pre-platform-vertical',
   'sss-platform', 'sss-platform-new',
-  'conc-up-down', 'conc-interchange'
+  'conc-up-down', 'conc-interchange',
+  '2-line-led'
 ]
 
 let verticalPIDs = ['fss-escalator', 'pre-platform-vertical', 'conc-interchange']
@@ -27,6 +28,11 @@ async function render(fullStationName, platform, type) {
   if (verticalPIDs.includes(type)) {
     width = 1800
     height = 3200
+  }
+
+  if (type === '2-line-led') {
+    width = 3200
+    height = 1174
   }
 
   await page.setViewport({
@@ -47,6 +53,9 @@ async function render(fullStationName, platform, type) {
   }
   if (type.startsWith('conc-')) {
     url = `https://vic.transportsg.me/mockups/get?station=${fullStationName}&concourseType=${type.slice(5)}&type=concourse`
+  }
+  if (type === '2-line-led') {
+    url = `https://vic.transportsg.me/mockups/metro-led-pids/${fullStationName.toLowerCase().replace(/ /g, '-')}/${platform}`
   }
 
   await page.goto(url, { waitUntil: 'networkidle2' })
