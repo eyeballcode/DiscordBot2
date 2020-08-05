@@ -11,7 +11,8 @@ let pidTypes = [
   'sss-platform', 'sss-platform-new',
   'conc-up-down', 'conc-interchange',
   '2-line-led',
-  'crt'
+  'crt',
+  'vline-half-platform'
 ]
 
 let verticalPIDs = ['fss-escalator', 'pre-platform-vertical', 'conc-interchange']
@@ -57,9 +58,6 @@ async function render(fullStationName, platform, type) {
   }
   if (type === '2-line-led') {
     url = `https://vic.transportsg.me/mockups/metro-led-pids/${fullStationName.toLowerCase().replace(/ /g, '-')}/${platform}`
-  }
-  if (type === 'crt') {
-    url = `https://vic.transportsg.me/mockups/metro-crt/${fullStationName.toLowerCase().replace(/ /g, '-')}/${platform}`
   }
 
   await page.goto(url, { waitUntil: 'networkidle2' })
