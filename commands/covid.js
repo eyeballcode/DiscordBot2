@@ -2,28 +2,40 @@ const r = require('request-promise')
 const async = require('async')
 const cheerio = require('cheerio')
 
-let casesSelector = '.field--name-field-cln-box > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > span:nth-child(1)'
-let activeSelector = '.field--name-field-cln-box > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) > span:nth-child(1)'
-let deathsSelector = '.field--name-field-cln-box > div:nth-child(4) > div:nth-child(1) > div:nth-child(1) > span:nth-child(1)'
-let updatedSelector = '.updated'
+const TimedCache = require('../TimedCache')
+
+let dataCache = new TimedCache(1000 * 60 * 10)
 
 module.exports = {
   name: 'covid',
   description: 'COVID-19 Cases Today',
   exec: async (msg, args, bot) => {
-    let $ = cheerio.load(await r.get('https://www.dhhs.vic.gov.au/coronavirus'))
+    let message
 
-    let cases = $(casesSelector).text()
-    let active = $(activeSelector).text()
-    let deaths = $(deathsSelector).text()
+    if (!(message = dataCache.get('W'))) {
+      let vicData = JSON.parse(await r.get('https://www.theage.com.au/interactive/2020/coronavirus/data-feeder/covid-19-new-cases-dc-json-vic-latest.json'))
+      let ausStats = JSON.parse(await r.get('https://www.smh.com.au/interactive/2020/coronavirus/data-feeder/covid-19-number-slugs-json-latest.json')).data
+      let ausTotals = JSON.parse(await r.get('https://theage.com.au/interactive/2020/coronavirus/data-feeder/covid-19-regional-totals-json.json'))
 
-    let updated = $(updatedSelector).text().slice(9).replace(/  +/g, ' ')
+      let vicTotal = ausTotals.cases.vic
+      let vicStats = ausStats.filter(label => label.area === 'vic')
 
-    msg.reply(`COVID-19 Stats (Updated ${updated}):
+      let newCases = vicData.changeCounters[0]
+      let cases = newCases.value
+
+      let vicRecovered = vicStats.find(label => label.label === 'Recovered').value
+      let active = vicTotal - vicRecovered
+      let deaths = ausTotals.deaths.vic
+
+      let updated = new Date(ausTotals.updated).toLocaleString()
+      message = `COVID-19 Stats (Updated ${updated}):
 New Cases: ${cases}
 Total Active: ${active}
 Total Deaths: ${deaths}
-`)
+`
+    }
+
+    msg.reply(message)
   }
 
 }
