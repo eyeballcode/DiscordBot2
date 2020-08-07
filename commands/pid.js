@@ -5,7 +5,7 @@ const fs = require('fs')
 
 let pidTypes = [
   'fss-escalator', 'fss-platform',
-  'train-from-fss',
+  'trains-from-fss',
   'half-platform', 'half-platform-bold', 'platform',
   'pre-platform-vertical',
   'sss-platform', 'sss-platform-new',
