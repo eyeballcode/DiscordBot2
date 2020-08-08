@@ -17,7 +17,7 @@ bot.on('ready', async () => {
 bot.on('message', msg => {
   let {content} = msg
   let parts
-  if (parts = content.match(/^!(\w+\??)(.+)?$/)) {
+  if (parts = content.match(/^!([^ ]*)( .+)?$/)) {
     let command = parts[1].toLowerCase()
     let args = (parts[2] || '').trim().split(/ +/)
 
