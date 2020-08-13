@@ -3,8 +3,10 @@ const trackerData = require('../data/class-status-tracker')
 
 const classes = rawClasses.filter(clazz => clazz.students.includes(trackerData.tracking)).sort((a, b) => new Date(a.start) - new Date(b.start))
 
+let url = "https://www.twitch.tv/AHHHHHHHHHHHHHHHHHHHHH"
+
 module.exports = bot => {
-  function setClassStatus() {
+  async function setClassStatus() {
     let now = new Date()
     let next = classes.find(clazz => new Date(clazz.end) > now)
     let start = new Date(next.start)
@@ -19,19 +21,19 @@ module.exports = bot => {
         status: 'online',
         activity: {
           name: subjectFormat,
-          type: 'WATCHING'
+          type: 'STREAMING'
         }
       })
 
       let timeToEndClass = new Date(next.end) - now
       setTimeout(setClassStatus, timeToEndClass + 1000)
     } else {
-      bot.user.setPresence({
+      let activities = trackerData.classFormat.NO_CLASS
+      let activity = activities[Math.round(Math.random() * activities.length)]
+
+      await bot.user.setPresence({
         status: 'online',
-        activity: {
-          name: trackerData.classFormat.NO_CLASS,
-          type: 'WATCHING'
-        }
+        activity
       })
 
       let timeToNextClass = new Date(next.start) - now

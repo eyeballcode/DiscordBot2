@@ -2,7 +2,20 @@
   "tracking": 11960,
   "classFormat": {
     "MENTDY": "trainsssssssss",
-    "NO_CLASS": "ron waste time",
+    "NO_CLASS": [{
+      "name": "ron waste time",
+      "type": "WATCHING"
+    }, {
+      "name": "Mathematica",
+      "type": "PLAYING"
+    }, {
+      "name": "to John Kermon",
+      "type": "LISTENING"
+    }, {
+      "name": "my depression",
+      "type": "STREAMING",
+      "url": "https://www.twitch.tv/AHHHHHHHHHHHHHHHHHHHHH"
+    }],
     "CHOIR": "ron sing",
     "JAZZCHOIR": "ron sing but in jazz",
     "RON_VOX": "ron sing but he's alone",
