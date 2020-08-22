@@ -67,11 +67,11 @@ async function answerQuestion(question, answer) {
 
 async function sendQuestion(question, msg) {
   currentFlag = question.resources[0].url
-  currentAnswers = question.options.map(a => a.text)
+  currentAnswers = question.options
 
   let attachment = new MessageAttachment(currentFlag)
   await msg.channel.send(`${msg.author}, This flag is from: `, attachment)
-  await msg.channel.send(`${msg.author}, Choices: \n${currentAnswers.join('\n')}`)
+  await msg.channel.send(`${msg.author}, Choices: \n${currentAnswers.map(a => a.text).join('\n')}`)
 }
 
 module.exports = {
@@ -85,14 +85,14 @@ module.exports = {
           currentGame = null
           return await msg.reply(`Stopped game. Rice donated: ${currentRice}`)
         }
-        let answerID = answer.toLowerCase()
-        if (currentAnswers.includes(answer)) {
-          let reply = await answerQuestion(currentQuestionID, answerID)
+        let foundAnswer = currentAnswers.find(a => a.text === answer)
+        if (foundAnswer) {
+          let reply = await answerQuestion(currentQuestionID, foundAnswer.id)
           if (reply.answer.correct) {
             await msg.reply('Correct! Here\'s a new question!')
           } else {
-            let correctAnswer = currentAnswers.find(a => a.toLowerCase() === reply.answer.answer) || reply.answer.question
-            await msg.reply(`Sorry, the answer was ${correctAnswer}. Here's a new question!`)
+            let correctAnswer = currentAnswers.find(a => a.id === reply.answer.answer) || reply.answer.answer
+            await msg.reply(`Sorry, the answer was ${correctAnswer.text}. Here's a new question!`)
           }
 
           currentQuestion = reply.question
