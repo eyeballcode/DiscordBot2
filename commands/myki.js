@@ -6,9 +6,13 @@ const fs = require('fs')
 const path = require('path')
 const moment = require('moment')
 require('moment-timezone')
+const cheerio = require('cheerio')
 
 let mykiPath = path.join(__dirname, '../data/myki.json')
 let dataCache = new TimedCache(1000 * 60 * 10)
+
+let ptvKey
+let cacheTime
 
 let cardTypes = {
   "0": "Default",
@@ -84,6 +88,29 @@ let cardTypes = {
   "71": "Technician Validation Card"
 }
 
+async function getPTVKey() {
+  if (cacheTime && (new Date - cacheTime) < 1000 * 60 * 60) { // Cache key for 1hr max
+    return ptvKey
+  }
+
+  let ptvData = await request('https://ptv.vic.gov.au')
+  let $ = cheerio.load(ptvData)
+  let script = Array.from($('body script')).find(s => {
+    if (s.children[0]) {
+      let t = s.children[0].data
+      return t.includes('server_state') && t.includes('mykiToken') && t.includes('mapToken')
+    }
+  }).children[0].data
+
+  let data = JSON.parse(script.slice(script.indexOf('=') + 1))
+  let key = `${data.mykiTime}-${data.mykiToken}`
+
+  ptvKey = key
+  cacheTime = new Date()
+
+  return key
+}
+
 module.exports = {
   name: 'myki',
   description: 'Checks your myki card',
@@ -105,7 +132,25 @@ module.exports = {
       if (userMyki) {
         let data
         if (!(data = dataCache.get(userMyki))) {
-          data = JSON.parse(await request(`https://mykiapi.ptv.vic.gov.au/myki/card/${userMyki}`))
+          try {
+            data = JSON.parse(await request.post(`https://mykiapi.ptv.vic.gov.au/v2/myki/card`, {
+              body: JSON.stringify({
+                0: {
+                  mykiCardNumber: userMyki
+                }
+              }),
+              headers: {
+                'authority': 'mykiapi.ptv.vic.gov.au',
+                'accept': 'application/json',
+                'content-type': 'application/json',
+                'referer': 'https://www.ptv.vic.gov.au/tickets/myki/' ,
+                'x-ptvwebauth': await getPTVKey()
+              },
+              gzip: true
+            })).data[0]
+          } catch (e) {
+            return msg.reply('Sorry, your myki card number was invalid')
+          }
           dataCache.set(userMyki, data)
         }
 

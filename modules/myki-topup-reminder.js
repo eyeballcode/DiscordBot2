@@ -3,6 +3,7 @@ let mykiCards = require('../data/myki.json')
 let mykiSettings = require('../data/myki-settings.json')
 const moment = require('moment')
 require('moment-timezone')
+const cheerio = require('cheerio')
 
 let channel
 
@@ -14,11 +15,52 @@ if (difference < 0) difference += 1440 * 60 * 1000
 
 let users = Object.keys(mykiCards)
 
+let ptvKey
+let cacheTime
+
+async function getPTVKey() {
+  if (cacheTime && (new Date - cacheTime) < 1000 * 60 * 60) { // Cache key for 1hr max
+    return ptvKey
+  }
+
+  let ptvData = await request('https://ptv.vic.gov.au')
+  let $ = cheerio.load(ptvData)
+  let script = Array.from($('body script')).find(s => {
+    if (s.children[0]) {
+      let t = s.children[0].data
+      return t.includes('server_state') && t.includes('mykiToken') && t.includes('mapToken')
+    }
+  }).children[0].data
+
+  let data = JSON.parse(script.slice(script.indexOf('=') + 1))
+  let key = `${data.mykiTime}-${data.mykiToken}`
+
+  ptvKey = key
+  cacheTime = new Date()
+
+  return key
+}
+
 async function getBalance(mykiCard) {
   let error
   for (let i = 0; i < 3; i++) {
     try {
-      let data = JSON.parse(await request(`https://mykiapi.ptv.vic.gov.au/myki/card/${mykiCard}`))
+      let data = JSON.parse(await request.post(`https://mykiapi.ptv.vic.gov.au/v2/myki/card`, {
+        body: JSON.stringify({
+          0: {
+            mykiCardNumber: mykiCard
+          }
+        }),
+        headers: {
+          'authority': 'mykiapi.ptv.vic.gov.au',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+          'referer': 'https://www.ptv.vic.gov.au/tickets/myki/' ,
+          'x-ptvwebauth': await getPTVKey()
+        },
+        gzip: true
+      })).data[0]
+
       return data
     } catch (e) {
       error = e
@@ -83,4 +125,12 @@ module.exports = bot => {
       checkCards(channel)
     }, 1440 * 60 * 1000)
   }, difference)
+
+  // preload api key 5min before sending topup reminders
+  setTimeout(() => {
+    getPTVKey()
+    setInterval(() => {
+      getPTVKey()
+    }, 1440 * 60 * 1000)
+  }, difference - 1000 * 60 * 5)
 }
