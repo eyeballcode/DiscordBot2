@@ -17,10 +17,24 @@ let pidTypes = [
 
 let verticalPIDs = ['fss-escalator', 'pre-platform-vertical', 'conc-interchange']
 
-async function render(fullStationName, platform, type) {
-  const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']})
-  const page = await browser.newPage()
+async function render(url, width, height, fileName) {
+  let browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']})
+  let page = await browser.newPage()
 
+  await page.setViewport({
+    width,
+    height,
+    deviceScaleFactor: 2
+  })
+
+  await page.goto(url, { waitUntil: 'networkidle2' })
+  await new Promise(resolve => setTimeout(resolve, 3000))
+
+  await page.screenshot({path: fileName})
+  await browser.close()
+}
+
+async function renderStationPID(fullStationName, platform, type) {
   let fileName = `${fullStationName}-${platform}-${type}`.toLowerCase().replace(/[^\w\d ]/g, '-').replace(/  */g, '-').replace(/--+/g, '-').replace(/-$/, '').replace(/^-/, '') + '.png'
 
   let width = 3200
@@ -36,12 +50,6 @@ async function render(fullStationName, platform, type) {
     width = 3200
     height = 1174
   }
-
-  await page.setViewport({
-    width,
-    height,
-    deviceScaleFactor: 2
-  })
 
   let url = `https://vic.transportsg.me/mockups/get?station=${fullStationName}&value=${platform}&type=${type}`
   if (type === 'sss-platform') {
@@ -60,12 +68,7 @@ async function render(fullStationName, platform, type) {
     url = `https://vic.transportsg.me/mockups/metro-led-pids/${fullStationName.toLowerCase().replace(/ /g, '-')}/${platform}`
   }
 
-  await page.goto(url, { waitUntil: 'networkidle2' })
-  await new Promise(resolve => setTimeout(resolve, 3000))
-
-  await page.screenshot({path: fileName})
-
-  await browser.close()
+  await render(url, width, height, fileName)
 
   return fileName
 }
@@ -75,36 +78,43 @@ module.exports = {
   description: 'Generates an image of a station PID',
   exec: async (msg, args, bot) => {
     let [stationCode, platform, type] = args
-    if (!(stationCode && platform && type)) return msg.reply('Format: !pid stationCode platform type')
+    let fileName
 
-    if (platform !== '*') platform = parseInt(platform)
+    if (stationCode === 'JMSS') {
+      msg.reply(`Rendering JMSS next bus display`)
+      fileName = 'jmss-big-screen.png'
+      await render('https://vic.transportsg.me/jmss-screens/big-screen', 2560, 1280, fileName)
+    } else {
+      if (!(stationCode && platform && type)) return msg.reply('Format: !pid stationCode platform type')
 
-    let fullStationName = stationCodeLookup[stationCode]
-    if (!fullStationName) return msg.reply('Sorry, that is an invalid station code')
-    if (!platform) return msg.reply('Sorry, that is an invalid platform.')
-    if (!pidTypes.includes(type)) return msg.reply('Sorry, that is an invalid PID Type')
+      if (platform !== '*') platform = parseInt(platform)
 
-    if (type.includes('sss-')) {
-      if (stationCode === 'SSS') {
-        platform = platform + (platform % 2 - 1)
-        platform = `${platform}-${platform + 1}`
-      } else {
-        return msg.reply(`Sorry, ${type} must be used at SSS`)
+      let fullStationName = stationCodeLookup[stationCode]
+      if (!fullStationName) return msg.reply('Sorry, that is an invalid station code')
+      if (!platform) return msg.reply('Sorry, that is an invalid platform.')
+      if (!pidTypes.includes(type)) return msg.reply('Sorry, that is an invalid PID Type')
+
+      if (type.includes('sss-')) {
+        if (stationCode === 'SSS') {
+          platform = platform + (platform % 2 - 1)
+          platform = `${platform}-${platform + 1}`
+        } else {
+          return msg.reply(`Sorry, ${type} must be used at SSS`)
+        }
       }
-    }
 
-    if (type === 'trains-from-fss') {
-      if (stationCode !== 'FSS' || platform !== '*') {
-        return msg.reply(`Sorry, trains-from-fss must be used at FSS with platform *`)
+      if (type === 'trains-from-fss') {
+        if (stationCode !== 'FSS' || platform !== '*') {
+          return msg.reply(`Sorry, trains-from-fss must be used at FSS with platform *`)
+        }
       }
-    }
-    if (type.startsWith('conc-') && platform !== '*') {
-      return msg.reply(`Sorry, ${type} must be used with platform *`)
-    }
+      if (type.startsWith('conc-') && platform !== '*') {
+        return msg.reply(`Sorry, ${type} must be used with platform *`)
+      }
 
-    msg.reply(`Rendering ${type} PID for ${fullStationName} Platform ${platform}`)
-
-    let fileName = await render(fullStationName, platform, type)
+      msg.reply(`Rendering ${type} PID for ${fullStationName} Platform ${platform}`)
+      fileName = await renderStationPID(fullStationName, platform, type)
+    }
 
     let attachment = new MessageAttachment(fileName)
     await msg.channel.send(`${msg.author}, `, attachment)
