@@ -1,7 +1,8 @@
 const config = require('../config.json')
 const request = require('request')
 
-let {SITE_WEBHOOK} = config
+let {SITE_WEBHOOK, SLOW_WEBHOOK} = config
+let lastMean = 0
 
 function httpRequest(url) {
   return new Promise(resolve => {
@@ -16,8 +17,12 @@ function httpRequest(url) {
 }
 
 async function check() {
-  let response = await httpRequest('https://vic.transportsg.me/health-check')
-  if (response !== 'Ok') {
+  let response = { status: 0 }
+  try {
+    response = JSON.parse(await httpRequest('https://vic.transportsg.me/response-stats'))
+  } catch (e) {}
+
+  if (response.status !== 'ok') {
     await request(SITE_WEBHOOK, {
       method: 'POST',
       json: true,
@@ -25,6 +30,18 @@ async function check() {
         content: `Site Not Responding: ${new Date().toLocaleString()}`
       }
     })
+  } else if (response.status.meanResponseTime > 5000) {
+    if (response.status.meanResponseTime !== lastMean) {
+      lastMean = response.status.meanResponseTime
+
+      await request(SLOW_WEBHOOK, {
+        method: 'POST',
+        json: true,
+        body: {
+          content: `Site very slow, mean response time ${lastMean}ms: ${new Date().toLocaleString()}`
+        }
+      })
+    }
   }
 }
 
