@@ -84,6 +84,10 @@ module.exports = {
       msg.reply(`Rendering JMSS next bus display`)
       fileName = 'jmss-big-screen.png'
       await render('https://vic.transportsg.me/jmss-screens/big-screen', 2560, 1280, fileName)
+    } else if (stationCode === 'bus') {
+      msg.reply('Rendering Bus PID display for ' + platform)
+      fileName = 'bus-int.png'
+      await render(`https://vic.transportsg.me/mockups/bus-int-pids/${platform}/${type || '*'}`, 3200, 900, fileName)
     } else {
       if (!(stationCode && platform && type)) return msg.reply('Format: !pid stationCode platform type')
 
