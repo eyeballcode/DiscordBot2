@@ -23,7 +23,9 @@ let messages = [
   "Ninjas surrounded %s one day... That is all.",
   "Poor %s. They fell into an endless pit",
   "Mutants killed %s",
-  "%s died from licking something they shouldn't have licked"
+  "%s died from licking something they shouldn't have licked",
+  "%s gave up",
+  "*Giving %s a toaster bath*"
 ]
 
 module.exports = {
