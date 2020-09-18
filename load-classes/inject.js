@@ -425,7 +425,7 @@ Object.keys(activities).forEach((classCode, i) => {
             students: instance.AttendeeUserIdList,
             start: instance.st,
             end: instance.fn,
-            teacher: instance.m,
+            teacher: instance.CoveringIid || instance.m,
             location: instance.l
           }
         })

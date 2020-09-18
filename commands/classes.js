@@ -21,7 +21,7 @@ module.exports = {
       matchingClasses = classes.filter(clazz => clazz.students.includes(userIDs[user]))
     }
 
-    if (matchingClasses) {
+    if (matchingClasses.length) {
       matchingClasses = matchingClasses.map(clazz => {
         let classCode = clazz.classCode
 
