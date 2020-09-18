@@ -54,6 +54,7 @@ module.exports = {
       let now = moment.tz('Australia/Melbourne')
 
       let upcoming = matchingClasses.filter(event => event.endTime > now).sort((a, b) => a.startTime - b.startTime)
+      if (!upcoming[0]) return msg.reply('Sorry, you don\'t have any upcoming classes')
 
       let current, next, following
 
