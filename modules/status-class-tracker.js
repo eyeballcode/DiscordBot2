@@ -21,7 +21,7 @@ module.exports = bot => {
         status: 'online',
         activity: {
           name: subjectFormat,
-          type: 'STREAMING'
+          type: 'WATCHING'
         }
       })
 

@@ -39,7 +39,7 @@ module.exports = class AudioQueue {
 
   async stop() {
     if (this.currentlyPlaying) {
-      this.currentlyPlaying.pause(true)
+      this.currentlyPlaying.pause()
     }
     this.currentlyPlaying = null
     this.queue = []
