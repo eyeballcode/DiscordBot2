@@ -8,7 +8,7 @@ async function authoriseUser(user, textChannel, authorised) {
 
 module.exports = bot => {
   let server = bot.guilds.cache.find(server => server.name === vcControl.server_name)
-  let voiceChannel = server.channels.cache.find(channel => channel.name === vcControl.vc_channel)
+  let voiceChannel = server.channels.cache.find(channel => channel.name === vcControl.vc_channel || channel.id === vcControl.vc_channel)
   let textChannel = server.channels.cache.find(channel => channel.name === vcControl.text_channel)
 
   let voiceChannelID = voiceChannel.id
