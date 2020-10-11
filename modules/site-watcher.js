@@ -30,7 +30,7 @@ async function check() {
         content: `Site Not Responding: ${new Date().toLocaleString()}`
       }
     })
-  } else if (response.status.meanResponseTime > 5000) {
+  } else if (response.status.meanResponseTime >= 3000) {
     if (response.status.meanResponseTime !== lastMean) {
       lastMean = response.status.meanResponseTime
 
