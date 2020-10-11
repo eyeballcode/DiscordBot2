@@ -30,9 +30,9 @@ async function check() {
         content: `Site Not Responding: ${new Date().toLocaleString()}`
       }
     })
-  } else if (response.status.meanResponseTime >= 3000) {
-    if (response.status.meanResponseTime !== lastMean) {
-      lastMean = response.status.meanResponseTime
+  } else if (response.meanResponseTime >= 3000) {
+    if (response.meanResponseTime !== lastMean) {
+      lastMean = response.meanResponseTime
 
       await request(SLOW_WEBHOOK, {
         method: 'POST',
