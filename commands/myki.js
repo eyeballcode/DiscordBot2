@@ -115,7 +115,7 @@ module.exports = {
   name: 'myki',
   description: 'Checks your myki card',
   exec: async (msg, args, bot) => {
-    let target = msg.author
+    let target = msg.mentions.users.first() || msg.author
     let user = `${target.username}#${target.discriminator}`
 
     if (args[0] === 'register' && args[1]) {

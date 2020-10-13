@@ -114,8 +114,6 @@ You can topup here https://www.ptv.vic.gov.au/mykitopup/`)
 }
 
 module.exports = bot => {
-  return // Its stage 4 - no one is travelling
-
   let server = bot.guilds.cache.find(server => server.name === mykiSettings.server_name)
   let channel = server.channels.cache.find(channel => channel.name === mykiSettings.channel_name)
 
