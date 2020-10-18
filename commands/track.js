@@ -1,4 +1,6 @@
 const request = require('request-promise')
+const moment = require('moment')
+require('moment-timezone')
 
 module.exports = {
   name: 'track',
@@ -8,6 +10,8 @@ module.exports = {
     if (mode) {
       let url
       let type
+      let date = moment.tz('Australia/Melbourne').format('YYYYMMDD')
+
       if (mode === 'service') {
         if (!arg) return msg.reply('You need to specify a service number')
         url = `https://vic.transportsg.me/bus/tracker/bot?service=${args[1]}`
@@ -18,11 +22,11 @@ module.exports = {
         type = 'bus'
       } else if (mode === 'train') {
         if (!arg) return msg.reply('You need to specify a train number')
-        url = `https://vic.transportsg.me/metro/tracker/bot?consist=${args[1]}`
+        url = `https://vic.transportsg.me/metro/tracker/bot?consist=${args[1]}&date=${date}`
         type = 'train'
       } else if (mode === 'tdn') {
         if (!arg) return msg.reply('You need to specify a TDN number')
-        url = `https://vic.transportsg.me/metro/tracker/bot?runID=${args[1]}`
+        url = `https://vic.transportsg.me/metro/tracker/bot?runID=${args[1]}&date=${date}`
         type = 'train'
       } else return msg.reply('That doesn\'t look like a valid mode')
 
