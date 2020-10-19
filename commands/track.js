@@ -40,7 +40,7 @@ module.exports = {
           return line
         })
       } else if (type === 'train') {
-        lines = data.map(trip => {
+        lines = data.trips.map(trip => {
           let line = `${trip.runID}: ${trip.departureTime} ${trip.origin} - ${trip.destination}: ${trip.consist.join('-')}`
           return line
         })
