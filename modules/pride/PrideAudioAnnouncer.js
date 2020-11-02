@@ -6,7 +6,7 @@ module.exports = class PrideAudioAnnouncer {
 
   constructor(bot, station, platform) {
     let server = bot.guilds.cache.find(guild => guild.name === audioConfig.server_name)
-    this.voiceChannel = server.channels.cache.find(channel => channel.name === audioConfig.channel_name)
+    this.voiceChannel = server.channels.cache.find(channel => channel.name === audioConfig.channel_name || channel.id === audioConfig.channel_name)
 
     this.station = station
     this.platform = platform

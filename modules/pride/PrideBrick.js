@@ -118,7 +118,7 @@ let currentInstance = null
 
 module.exports = async (station, platform, bot) => {
   let server = bot.guilds.cache.find(guild => guild.name === audioConfig.server_name)
-  let voiceChannel = server.channels.cache.find(channel => channel.name === audioConfig.channel_name)
+  let voiceChannel = server.channels.cache.find(channel => channel.name === audioConfig.channel_name || channel.id === audioConfig.channel_name)
 
   if (currentInstance) {
     currentInstance.pause(true)
