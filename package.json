@@ -22,10 +22,10 @@
     "moment-timezone": "^0.5.31",
     "node-ical": "^0.10.0",
     "node-wav": "0.0.2",
+    "opusscript": "^0.0.7",
     "puppeteer": "^5.2.1",
     "request": "^2.88.2",
     "request-promise": "^4.2.5",
-    "sodium": "^3.0.2",
     "utf-8-validate": "^5.0.2",
     "wav": "^1.0.2",
     "zlib-sync": "^0.1.6"
