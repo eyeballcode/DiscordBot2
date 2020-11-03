@@ -77,12 +77,13 @@ function checkCards(channel) {
   users.forEach(async user => {
     let parts = user.split('#')
     let mykiCard = mykiCards[user]
-    let targetUser = channel.guild.members.cache.find(user => user.user.username === parts[0] && user.user.discriminator === parts[1])
+    let targetUser = channel.guild.members.cache.find(user => console.log(user) || user.user.username === parts[0] && user.user.discriminator === parts[1])
+    let userPing = targetUser || user
 
     let data = await getBalance(mykiCard)
     if (data.errored) {
       console.log(user, data.error)
-      return channel.send(`Sorry ${targetUser}, failed to check your myki balance`)
+      return channel.send(`Sorry ${userPing}, failed to check your myki balance`)
     }
     let balance = parseFloat(data.mykiBalance)
 
@@ -101,13 +102,13 @@ function checkCards(channel) {
     }
 
     if (expiringMykiPass && lowBalance) {
-      channel.send(`${targetUser}, Your myki pass will be expiring soon and your balance ${balance < 0 ? '-$' : '$'}${Math.abs(balance.toFixed(2))} of is running low. Remember to topup your myki!
+      channel.send(`${userPing}, Your myki pass will be expiring soon and your balance ${balance < 0 ? '-$' : '$'}${Math.abs(balance.toFixed(2))} of is running low. Remember to topup your myki!
 You can topup here https://www.ptv.vic.gov.au/mykitopup/`)
     } else if (expiringMykiPass) {
-      channel.send(`${targetUser}, Your myki pass will be expiring soon. Remember to topup your myki!
+      channel.send(`${userPing}, Your myki pass will be expiring soon. Remember to topup your myki!
 You can topup here https://www.ptv.vic.gov.au/mykitopup/`)
     } else if (lowBalance && !hasPassCovering) {
-      channel.send(`${targetUser}, Your myki has a balance of ${balance < 0 ? '-$' : '$'}${Math.abs(balance.toFixed(2))}. Remember to topup your myki!
+      channel.send(`${userPing}, Your myki has a balance of ${balance < 0 ? '-$' : '$'}${Math.abs(balance.toFixed(2))}. Remember to topup your myki!
 You can topup here https://www.ptv.vic.gov.au/mykitopup/`)
     }
   })
