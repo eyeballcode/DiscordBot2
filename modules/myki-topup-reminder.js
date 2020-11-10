@@ -77,7 +77,7 @@ function checkCards(channel) {
   users.forEach(async user => {
     let parts = user.split('#')
     let mykiCard = mykiCards[user]
-    let targetUser = channel.guild.members.cache.find(user => console.log(user) || user.user.username === parts[0] && user.user.discriminator === parts[1])
+    let targetUser = channel.guild.members.cache.find(user => user.user.username === parts[0] && user.user.discriminator === parts[1])
     let userPing = targetUser || user
 
     let data = await getBalance(mykiCard)

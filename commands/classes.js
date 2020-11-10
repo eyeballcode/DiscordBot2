@@ -18,10 +18,10 @@ module.exports = {
     let matchingClasses = []
     if (args[0] && args[0].length === 4) {
       matchingClasses = classes.filter(clazz => clazz.teacher === args[0])
-    } else if (userIDs[user]) {
-      matchingClasses = classes.filter(clazz => clazz.students.includes(userIDs[user]))
     } else if (studentIDs[args[0]]) {
       matchingClasses = classes.filter(clazz => clazz.students.includes(studentIDs[args[0]]))
+    } else if (userIDs[user]) {
+      matchingClasses = classes.filter(clazz => clazz.students.includes(userIDs[user]))
     }
 
     if (matchingClasses.length) {
