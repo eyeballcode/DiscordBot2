@@ -93,7 +93,7 @@ module.exports = {
 
       if (platform !== '*') platform = parseInt(platform)
 
-      let fullStationName = stationCodeLookup[stationCode]
+      let fullStationName = stationCodeLookup[stationCode.toUpperCase()]
       if (!fullStationName) return msg.reply('Sorry, that is an invalid station code')
       if (!platform) return msg.reply('Sorry, that is an invalid platform.')
       if (!pidTypes.includes(type)) return msg.reply('Sorry, that is an invalid PID Type')
