@@ -21,6 +21,7 @@ bot.on('message', msg => {
     let command = parts[1].toLowerCase()
     let args = (parts[2] || '').trim().split(/ +/)
 
+    if (msg.guild.id === 636354429049896991 && (command !== 'pid' || command !== 'wtt')) return
     if (commands[command]) {
       msg.react('🏳️‍🌈')
       commands[command].exec(msg, args, bot)
