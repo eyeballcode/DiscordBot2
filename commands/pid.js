@@ -8,14 +8,14 @@ let pidTypes = [
   'trains-from-fss',
   'half-platform', 'half-platform-bold', 'platform',
   'pre-platform-vertical',
-  'sss-platform', 'sss-platform-new',
+  'sss-platform', 'sss-platform-new', 'sss-coach-new',
   'conc-up-down', 'conc-interchange',
   '2-line-led',
   'crt',
-  'vline-half-platform'
+  'vline-half-platform',
 ]
 
-let verticalPIDs = ['fss-escalator', 'pre-platform-vertical', 'conc-interchange']
+let verticalPIDs = ['fss-escalator', 'pre-platform-vertical', 'conc-interchange', 'sss-coach-new']
 
 async function render(url, width, height, fileName) {
   let browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']})
@@ -58,6 +58,14 @@ async function renderStationPID(fullStationName, platform, type) {
   if (type === 'sss-platform-new') {
     url = `https://vic.transportsg.me/mockups/sss-new/platform/${platform}`
   }
+
+  if (type === 'sss-coach-new') {
+    let ranges = [[56, 57, 58], [59, 60, 61, 62], [63, 64, 65, 66], [67, 68, 69, 70]]
+    let range = ranges.find(r => r.includes(platform))
+    if (!range) range = [platform, 0, 0, 0]
+    url = `https://vic.transportsg.me/mockups/sss-new/coach?start=${range[0]}&size=${range.length}`
+  }
+
   if (type === 'trains-from-fss') {
     url = `https://vic.transportsg.me/mockups/fss/trains-from-fss`
   }
@@ -98,7 +106,11 @@ module.exports = {
       if (!platform) return msg.reply('Sorry, that is an invalid platform.')
       if (!pidTypes.includes(type)) return msg.reply('Sorry, that is an invalid PID Type')
 
-      if (type.includes('sss-')) {
+      if (type === 'sss-coach-new') {
+        if (stationCode !== 'SSS' || !platform) {
+          return msg.reply('Sorry, sss-coach-new must be used at SSS with a valid coach bay number')
+        }
+      } else if (type.includes('sss-')) {
         if (stationCode === 'SSS') {
           platform = platform + (platform % 2 - 1)
           platform = `${platform}-${platform + 1}`
