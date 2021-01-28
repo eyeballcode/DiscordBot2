@@ -326,7 +326,7 @@ Object.keys(activities).forEach((classCode, i) => {
       data: JSON.stringify({ activityId }),
       contentType: 'application/json; charset=utf-8',
       success: data => {
-        let instances = data.d.Instances
+        let instances = data.d.Instances.filter(instance => instance.RunningStatus)
         let classes = instances.map(instance => {
           return {
             classCode,
