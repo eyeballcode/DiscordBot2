@@ -9,8 +9,8 @@ module.exports = {
 
     let matched = timetables.filter(timetable => timetable.runID === td)
     matched.forEach(timetable => {
-      let text = timetable.tripTimings.map(stop => `${stop.locationName}: ${stop.departureTime || stop.arrivalTime}`).join('\n')
-      msg.reply(`Operates: ${timetable.days.join(', ')}
+      let text = timetable.stopTimings.map(stop => `${stop.locationName}: ${stop.departureTime || stop.arrivalTime}`).join('\n')
+      msg.reply(`Operates: ${timetable.operationDays.join(', ')}
 Type: ${timetable.movementType}
 ${text}`)
     })
