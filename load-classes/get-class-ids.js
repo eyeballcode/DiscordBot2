@@ -1,11 +1,13 @@
 let start = 3495
-let end = 3564
+let end = 3580
 let d = end - start
 
 let url = 'https://jmss-vic.compass.education/Services/Subjects.svc/GetStandardClassesOfSubject'
 
 let activityCodes = {}
 let subjectNames = {}
+
+let completed = 0
 
 for (let i = 0; i <= d; i++) {
   let currentCode = start + i
@@ -21,6 +23,25 @@ for (let i = 0; i <= d; i++) {
           activityCodes[activity.importIdentifier] = activity.id
           subjectNames[activity.subjectImportIdentifier] = activity.subjectLongName
         })
+
+        completed++
+        if (completed === d) {
+          setTimeout(() => {
+            $.ajax({
+              type: 'POST',
+              url: 'https://localhost/activities',
+              data: JSON.stringify(activityCodes),
+              contentType: 'application/json; charset=utf-8'
+            })
+
+            $.ajax({
+              type: 'POST',
+              url: 'https://localhost/subjects',
+              data: JSON.stringify(subjectNames),
+              contentType: 'application/json; charset=utf-8'
+            })
+          }, 5000)
+        }
       },
       dataType: 'json'
     })
