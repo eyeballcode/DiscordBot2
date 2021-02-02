@@ -232,6 +232,10 @@ let activities = {
   "12PSTY8F": 30334,
   "12PSTY8A": 30344,
   "12PSTY8H": 30345,
+  "12PSTY8B": 30510,
+  "12PSTY8C": 30511,
+  "12PSTY8D": 30512,
+  "12PSTY8G": 30513,
   "TRUMPETA": 30350,
   "TRUMPETB": 30352,
   "TRUMPETC": 30353,
@@ -310,8 +314,11 @@ let activities = {
   "12PSTC5E": 30426,
   "12PSTC6F": 30434,
   "13UHIP6A": 30437,
-  "13UCHE4A": 30423
+  "13UCHE4A": 30423,
+  "11PSTU6F": 30500,
+  "10LLOT4A": 30502
 }
+
 
 let getLessonsURL = 'https://jmss-vic.compass.education/Services/Activity.svc/GetLessonsByActivityId?sessionstate=readonly'
 let submitDataURL = 'https://localhost/classes'
