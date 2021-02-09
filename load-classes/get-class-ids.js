@@ -15,7 +15,7 @@ for (let i = 0; i <= d; i++) {
     $.ajax({
       type: 'POST',
       url,
-      data: JSON.stringify({ subjectId: currentCode, page: 1, start: 0, limit: 50}),
+      data: JSON.stringify({ subjectId: currentCode, page: 1, start: 0, limit: 300}),
       contentType: 'application/json; charset=utf-8',
       success: data => {
         let activities = data.d.data
