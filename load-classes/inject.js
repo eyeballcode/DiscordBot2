@@ -1,4 +1,4 @@
-let activities = { 
+let activityCodes = {
   "12SBIO1A": 30105,
   "12SBIO1B": 30106,
   "12SBIO4C": 30161,
@@ -270,6 +270,22 @@ let activities = {
   "GUITARANHTUAN": 30383,
   "GUITAREMIL": 30384,
   "ORCHESTRAB": 30385,
+  "CLARIA2021DB": 30441,
+  "CLARIB2021JH": 30442,
+  "CLARIC2021JW": 30443,
+  "CLARID2021JT": 30444,
+  "FLUTEA2021AC": 30445,
+  "FLUTEB2021HA": 30446,
+  "FLUTEC2021HJ": 30447,
+  "FLUTED2021DG": 30448,
+  "FLUTEE2021LH": 30449,
+  "SAXA2021KH": 30450,
+  "SAXB2021MM": 30451,
+  "SAXC2021TA": 30452,
+  "SAXF2021JC": 30453,
+  "SAXE2021TSH": 30454,
+  "FLUTEF2021LCW": 30457,
+  "PIANO_KAYDEN": 30458,
   "12PSTA1A": 30395,
   "12PSTA2B": 30403,
   "12PSTA3C": 30411,
@@ -305,27 +321,26 @@ let activities = {
   "12HLOT6F": 30438,
   "13UDKR1A": 30402,
   "13UCLC2A": 30408,
-  "13UPHY3A": 30416,
   "12VET2B": 30410,
   "12VET5E": 30431,
   "12VET6F": 30439,
-  "13UBIO6A": 30436,
+  "13UPHY3A": 30416,
   "12PSTC4D": 30420,
   "12PSTC5E": 30426,
   "12PSTC6F": 30434,
-  "13UHIP6A": 30437,
   "13UCHE4A": 30423,
+  "13UBIO6A": 30436,
+  "13UHIP6A": 30437,
   "11PSTU6F": 30500,
   "10LLOT4A": 30502
 }
 
-
 let getLessonsURL = 'https://jmss-vic.compass.education/Services/Activity.svc/GetLessonsByActivityId?sessionstate=readonly'
 let submitDataURL = 'https://localhost/classes'
 
-Object.keys(activities).forEach((classCode, i) => {
+Object.keys(activityCodes).forEach((classCode, i) => {
   setTimeout(() => {
-    let activityId = activities[classCode].toString()
+    let activityId = activityCodes[classCode].toString()
 
     $.ajax({
       type: 'POST',

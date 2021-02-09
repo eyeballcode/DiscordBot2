@@ -46,7 +46,7 @@ let server = https.createServer({
       } else if (req.url === '/subjects') {
         fs.writeFileSync(subjectsPath, JSON.stringify(data, null, 2))
       } else if (req.url === '/classes') {
-        classes = classes.concat(data)
+        classes = classes.concat(data).sort((a, b) => { new Date(a.start) - new Date(b.start)  })
         fs.writeFileSync(classPath, JSON.stringify(classes))
 
         if (data[0]) { // Some subjects have no classes
