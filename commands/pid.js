@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer')
 const stationCodeLookup = require('../data/station-codes-lookup')
+const config = require('../config')
 const { MessageAttachment } = require('discord.js')
 const fs = require('fs')
 
@@ -15,11 +16,17 @@ let pidTypes = [
   'vline-half-platform',
 ]
 
+let mockupsAuth = 'Basic ' + Buffer.from(config.mockups).toString('base64')
+
 let verticalPIDs = ['fss-escalator', 'pre-platform-vertical', 'conc-interchange', 'sss-coach-new']
 
 async function render(url, width, height, fileName) {
   let browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']})
   let page = await browser.newPage()
+
+  page.setExtraHTTPHeaders({
+    'Authorization': mockupsAuth
+  })
 
   await page.setViewport({
     width,
@@ -107,7 +114,7 @@ module.exports = {
       if (!pidTypes.includes(type)) return msg.reply('Sorry, that is an invalid PID Type')
 
       if (type === 'sss-coach-new') {
-        if (stationCode !== 'SSS' || !platform) {
+        if (stationCode !== 'SSS' || !platform || platform === '*') {
           return msg.reply('Sorry, sss-coach-new must be used at SSS with a valid coach bay number')
         }
       } else if (type.includes('sss-')) {
