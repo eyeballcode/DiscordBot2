@@ -35,7 +35,7 @@ async function render(url, width, height, fileName) {
   })
 
   await page.goto(url, { waitUntil: 'networkidle2' })
-  await new Promise(resolve => setTimeout(resolve, 3000))
+  await new Promise(resolve => setTimeout(resolve, 4500))
 
   await page.screenshot({path: fileName})
   await browser.close()
