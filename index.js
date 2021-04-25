@@ -22,7 +22,7 @@ bot.on('message', msg => {
     let args = (parts[2] || '').trim().split(/ +/)
 
     let valid = ['wtt', 'pid', 'field']
-    if (msg.guild.id == 636354429049896991 && !valid.includes(command)) return
+    if (msg.guild && msg.guild.id == 636354429049896991 && !valid.includes(command)) return
     if (commands[command]) {
       msg.react('🏳️‍🌈')
       commands[command].exec(msg, args, bot)

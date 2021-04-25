@@ -1,4 +1,4 @@
-let getLessonsURL = 'https://jmss-vic.compass.education/Services/Activity.svc/GetLessonsByActivityId?sessionstate=readonly'
+let getLessonsURL = 'https://jmss-vic.compass.education/Services/Activity.svc/GetLessonsByActivityId'
 let submitDataURL = 'https://localhost/classes'
 
 Object.keys(activityCodes).forEach((classCode, i) => {
@@ -15,6 +15,7 @@ Object.keys(activityCodes).forEach((classCode, i) => {
         let classes = instances.map(instance => {
           return {
             classCode,
+            subjectID: data.d.SubjectId,
             students: instance.AttendeeUserIdList,
             start: instance.st,
             end: instance.fn,
