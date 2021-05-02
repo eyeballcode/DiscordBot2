@@ -1,47 +1,49 @@
-let urlSubjects = 'https://jmss-vic.compass.education/Services/UserInclusion.svc/GetThinSubjects'
-let urlActivities = 'https://jmss-vic.compass.education/Services/UserInclusion.svc/GetThinClasses'
+let start = 3495
+let end = 3619
+let d = end - start
+
+let url = 'https://jmss-vic.compass.education/Services/Subjects.svc/GetStandardClassesOfSubject'
 
 let activityCodes = {}
 let subjectNames = {}
 
-$.ajax({
-  type: 'POST',
-  url: urlSubjects,
-  data: '{}',
-  contentType: 'application/json; charset=utf-8',
-  success: data => {
-    subjectNames = data.d.reduce((acc, subject) => {
-      acc[subject.id] = subject.name
-      return acc
-    }, {})
+let completed = 0
 
+for (let i = 0; i <= d; i++) {
+  let currentCode = start + i
+  setTimeout(() => {
     $.ajax({
       type: 'POST',
-      url: urlActivities,
-      data: '{}',
+      url,
+      data: JSON.stringify({ subjectId: currentCode, page: 1, start: 0, limit: 300}),
       contentType: 'application/json; charset=utf-8',
       success: data => {
-        activityCodes = data.d.reduce((acc, activity) => {
-          acc[activity.name] = activity.id
-          return acc
-        }, {})
-
-        $.ajax({
-          type: 'POST',
-          url: 'https://localhost/activities',
-          data: JSON.stringify(activityCodes),
-          contentType: 'application/json; charset=utf-8'
+        let activities = data.d.data
+        activities.forEach(activity => {
+          activityCodes[activity.importIdentifier] = activity.id
+          subjectNames[activity.subjectImportIdentifier] = activity.subjectLongName
         })
 
-        $.ajax({
-          type: 'POST',
-          url: 'https://localhost/subjects',
-          data: JSON.stringify(subjectNames),
-          contentType: 'application/json; charset=utf-8'
-        })
+        completed++
+        if (completed === d) {
+          setTimeout(() => {
+            $.ajax({
+              type: 'POST',
+              url: 'https://localhost/activities',
+              data: JSON.stringify(activityCodes),
+              contentType: 'application/json; charset=utf-8'
+            })
+
+            $.ajax({
+              type: 'POST',
+              url: 'https://localhost/subjects',
+              data: JSON.stringify(subjectNames),
+              contentType: 'application/json; charset=utf-8'
+            })
+          }, 5000)
+        }
       },
       dataType: 'json'
     })
-  },
-  dataType: 'json'
-})
+  }, i * 250)
+}
