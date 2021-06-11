@@ -9,3 +9,13 @@
 /data/watch-games.json
 /data/rice.json
 /data/vc-control.json
+*.zip
+/staff.json
+/weekly_operational_notice
+/transfers
+/student
+/staff
+/roll
+/events*
+/data/classes-old.json
+/data/won.dat
