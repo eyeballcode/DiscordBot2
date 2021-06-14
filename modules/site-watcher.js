@@ -30,7 +30,7 @@ async function check() {
         content: `Site Not Responding: ${new Date().toLocaleString()}`
       }
     })
-  } else if (response.meanResponseTime >= 3000) {
+  } else if (response.meanResponseTime >= 3500) {
     if (response.meanResponseTime !== lastMean) {
       lastMean = response.meanResponseTime
 
@@ -38,7 +38,10 @@ async function check() {
         method: 'POST',
         json: true,
         body: {
-          content: `Site very slow, mean response time ${lastMean}ms: ${new Date().toLocaleString()}`
+          content: `Site very slow:
+Mean Response Time ${response.meanResponseTime}ms
+PTV Response time ${response.ptvMeanResponseTime}ms
+At: ${new Date().toLocaleString()}`
         }
       })
     }

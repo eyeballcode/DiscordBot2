@@ -37,6 +37,7 @@ async function check() {
   let $ = cheerio.load(body)
 
   let wonButtons = Array.from($('[data-block-type="53"]'))
+  if (wonButtons.length === 0) return // Request must have failed
 
   if (wonButtons.length !== wonCount) {
     wonCount = wonButtons.length
