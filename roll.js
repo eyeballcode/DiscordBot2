@@ -61,7 +61,8 @@ let newRolls = generateClassesByStudent(newClasses)
 
 let transfers = {}
 
-Object.keys(oldRolls).forEach(student => {
+let allRolls = Object.keys(oldRolls).concat(Object.keys(newRolls)).filter((e, i, a) => a.indexOf(e) === i)
+allRolls.forEach(student => {
   let oldRoll = oldRolls[student] || []
   let newRoll = newRolls[student] || []
 
@@ -78,6 +79,7 @@ Object.keys(oldRolls).forEach(student => {
     if (!oldMini.includes(c)) transfer.push(`${c} - Transfer In`)
   })
   transfers[student] = transfer
+
   fs.writeFileSync(`./student/${student}.txt`, newRoll.join('\n'))
   if (transfer.length) fs.writeFileSync(`./transfers/${student}.txt`, transfer.length ? transfer.sort((a, b) => a.localeCompare(b)).join('\n') : 'No Transfers')
 })
