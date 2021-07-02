@@ -7,7 +7,7 @@ let lastMean = 0
 function httpRequest(url) {
   return new Promise(resolve => {
     request(url, {
-      timeout: 5000,
+      timeout: 15000,
       gzip: true,
       forever: true
     }, (err, data, body) => {
