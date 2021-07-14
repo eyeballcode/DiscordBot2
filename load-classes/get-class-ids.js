@@ -1,5 +1,5 @@
 let start = 3495
-let end = 3660
+let end = 3693
 let d = end - start
 
 let url = 'https://jmss-vic.compass.education/Services/Subjects.svc/GetStandardClassesOfSubject'
