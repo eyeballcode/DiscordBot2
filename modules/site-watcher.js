@@ -45,6 +45,20 @@ At: ${new Date().toLocaleString()}`
         }
       })
     }
+  } else if (response.ptvMeanResponseTime > 3000) {
+    if (response.ptvMeanResponseTime !== lastMean) {
+      lastMean = response.meanResponseTime
+      await request(SLOW_WEBHOOK, {
+        method: 'POST',
+        json: true,
+        body: {
+          content: `PTV very slow:
+Mean Response Time ${response.meanResponseTime}ms
+PTV Response time ${response.ptvMeanResponseTime}ms
+At: ${new Date().toLocaleString()}`
+        }
+      })
+    }
   }
 }
 
