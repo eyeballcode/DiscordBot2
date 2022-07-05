@@ -9,7 +9,7 @@
   "author": "Eyeballcode",
   "license": "ISC",
   "dependencies": {
-    "@discordjs/opus": "^0.1.0",
+    "@discordjs/opus": "^0.8.0",
     "@turf/turf": "^5.1.6",
     "async": "^3.2.0",
     "bufferutil": "^4.0.1",
